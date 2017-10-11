@@ -273,6 +273,8 @@ class WMPlayer: UIView {
             fullScreenBtn2.isHidden = needShowControlView()
         }
     }
+    
+    var seekCount: Int = 0
 
     func refreshGravity() {
         if isFullscreen {
@@ -412,7 +414,7 @@ class WMPlayer: UIView {
         addSubview(bottomView)
 
         let colorTop = UIColor(white: 0, alpha: 0)
-        let colorBottom = UIColor(white: 0, alpha: 0.6)
+        let colorBottom = UIColor(white: 0, alpha: 0.4)
 
         gradient = CAGradientLayer()
         gradient.colors = Array(arrayLiteral: colorTop.cgColor, colorBottom.cgColor)
@@ -631,15 +633,20 @@ class WMPlayer: UIView {
 
     //MARK: - 播放进度
     @objc fileprivate func updateProgress(slider: UISlider) {
-        isDragingSlider = false
-
+    
         if fabsf(progressSlider.value - progressSlider.maximumValue) < 0.01 {
             moviePlayDidEnd(notification: nil)
+            isDragingSlider = false
         } else {
-            guard let currentItem = self.currentItem else { return }
+            isDragingSlider = false
+            guard let currentItem = self.currentItem else {
+                return
+            }
             let total = CGFloat(currentItem.duration.value) / CGFloat(currentItem.duration.timescale)
             let dragedSeconds = floorf(Float(total) * progressSlider.value / progressSlider.maximumValue)
-            seekToTime(time: Double(dragedSeconds))
+            seekToTime(time: Double(dragedSeconds), complation: { [weak self] in
+                self?.isDragingSlider = false
+            })
             if state == WMPlayerState.finished {
                 play()
             }
@@ -806,7 +813,7 @@ class WMPlayer: UIView {
         }
     }
 
-    fileprivate func seekToTime(time: Double) {
+    fileprivate func seekToTime(time: Double, complation:(() -> Void)? = nil) {
         isSeekingAtStart = false
         guard let player = player else { return }
         guard let status = player.currentItem?.status else { return }
@@ -823,17 +830,21 @@ class WMPlayer: UIView {
             if isPlaying {
                 loadingView.startAnimating()
             }
-
+            seekCount += 1
             player.seek(to: CMTime(value: CMTimeValue(time1), timescale: 1), toleranceBefore: CMTime(value: 1, timescale: 1), toleranceAfter: CMTime(value: 1, timescale: 1)) { [weak self] (finished: Bool) in
-                guard let sSelf = self else { return }
-                if needPlay {
-                    sSelf.play()
+                guard let `self` = self else { return }
+                self.seekCount -= 1
+                if self.seekCount == 0 {
+                    if needPlay {
+                        self.play()
+                    }
+                    self.seekTime = 0
+                    complation?()
                 }
-                sSelf.seekTime = 0
             }
         }
     }
-
+    
     func convertTime(second: CGFloat) -> String {
         let d = Date(timeIntervalSince1970: TimeInterval(second))
         if second/3600 >= 1 {
@@ -879,6 +890,7 @@ class WMPlayer: UIView {
         playerLayer = nil
         playerView = nil
         videoDuration = 0
+        seekCount = 0
     }
 
     fileprivate func resetUI() {
@@ -1073,7 +1085,7 @@ class WMPlayer: UIView {
         let process: CGFloat = CGFloat(progressSlider.value / progressSlider.maximumValue)
         bottomProgress.frame = CGRect(x: bottomView.frame.origin.x, y: bottomView.frame.origin.y + bottomView.frame.size.height - 3, width: bottomView.frame.size.width*process, height: 3)
 
-        fakeScrollView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height - (isFullscreen ? 60 : 0 ))
+        fakeScrollView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height - 60)
         fakeScrollView.contentSize = CGSize(width: fakeScrollView.bounds.size.width + 1, height: fakeScrollView.bounds.size.height)
         fakeScrollView.bounces = false
 
@@ -1104,7 +1116,8 @@ class WMPlayer: UIView {
         if videoSize.width <= videoSize.height {
             duration = 0
         }
-
+        removeFromSuperview()
+        UIApplication.shared.keyWindow?.addSubview(self)
         UIView.animate(withDuration: duration, animations: { [weak self] in
             guard let sSelf = self else { return }
             sSelf.refreshGravity()
@@ -1115,7 +1128,7 @@ class WMPlayer: UIView {
 
     fileprivate func toFullScreenWithInterfaceOrientation(interfaceOrientation: UIInterfaceOrientation)
     {
-        removeFromSuperview()
+        
         guard let playerView = playerView else { return }
         if videoSize.width <= videoSize.height {
             isPortrait = true
@@ -1123,6 +1136,7 @@ class WMPlayer: UIView {
             playerView.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight)
             reloadLayout(isFullScreen: true)
         } else {
+            frame = CGRect(x: kScreenWidth/2 - kScreenHeight/2, y: kScreenHeight/2 - kScreenWidth/2, width: kScreenHeight, height: kScreenWidth)
             playerView.frame = bounds
             reloadLayout(isFullScreen: true)
             if interfaceOrientation == UIInterfaceOrientation.landscapeLeft {
@@ -1130,10 +1144,9 @@ class WMPlayer: UIView {
             } else {
                 transform = CGAffineTransform.init(rotationAngle: .pi/2)
             }
-            frame = CGRect(x:0, y:0, width:kScreenWidth , height:  kScreenHeight)
             isPortrait = false
         }
-        UIApplication.shared.keyWindow?.addSubview(self)
+        
         bringSubview(toFront: bottomView)
         bringSubview(toFront: muteButton)
     }

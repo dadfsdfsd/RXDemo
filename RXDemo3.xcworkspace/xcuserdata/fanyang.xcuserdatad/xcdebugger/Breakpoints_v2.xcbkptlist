@@ -22,49 +22,49 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "RXDemo3/Class/VideoPlayer/MPVideoPlayerCache/MPVPDownloader.swift"
-            timestampString = "529405534.801841"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "123"
-            endingLineNumber = "123"
-            landmarkName = "session"
-            landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "RXDemo3/Class/VideoPlayer/MPVideoPlayerCache/MPVPDownloader.swift"
-            timestampString = "529405534.80189"
+            filePath = "RXDemo3/Class/VideoPlayer/MPVideoPlayerCache/MPVPCacheManager.swift"
+            timestampString = "529415958.428911"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "197"
-            endingLineNumber = "197"
-            landmarkName = "processUnits()"
+            startingLineNumber = "131"
+            endingLineNumber = "131"
+            landmarkName = "addFullFileEntry(_:)"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "RXDemo3/Class/VideoPlayer/MPVideoPlayerCache/MPVPDownloader.swift"
-            timestampString = "529405534.801932"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "370"
-            endingLineNumber = "370"
-            landmarkName = "unitWorker(_:didReceive:)"
-            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "RXDemo3.MPVPCacheManager.addFullFileEntry(RXDemo3.MPVPCachedFileInformation) -&gt; ()"
+                  moduleName = "RXDemo3"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/fanyang/Desktop/RXDemo3/RXDemo/RXDemo3/Class/VideoPlayer/MPVideoPlayerCache/MPVPCacheManager.swift"
+                  timestampString = "529413906.708414"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "131"
+                  endingLineNumber = "131"
+                  offsetFromSymbolStart = "32">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in RXDemo3.MPVPCacheManager.addFullFileEntry(RXDemo3.MPVPCachedFileInformation) -&gt; ()"
+                  moduleName = "RXDemo3"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/fanyang/Desktop/RXDemo3/RXDemo/RXDemo3/Class/VideoPlayer/MPVideoPlayerCache/MPVPCacheManager.swift"
+                  timestampString = "529413906.709828"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "132"
+                  endingLineNumber = "132"
+                  offsetFromSymbolStart = "32">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

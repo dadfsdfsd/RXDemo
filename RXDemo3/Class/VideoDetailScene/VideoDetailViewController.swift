@@ -50,6 +50,7 @@ class VideoDetailViewController: BaseViewController<VideoDetailViewModel> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        MPVPCacheManager.sharedInstance.clearDisk()
         self.view.addSubview(player)
         player.frame = CGRect.init(x: 0, y: 200, width: self.view.width, height: 400    )
     }

@@ -79,7 +79,7 @@ class MPVPCacheManager: NSObject {
         willSet {
             if newValue >= maxCachedNum {
                 removeBeforeEntry()
-                currentCachedNum = maxCachedNum-1
+                currentCachedNum = maxCachedNum - 1
             }
         }
     }
@@ -206,8 +206,10 @@ class MPVPCacheManager: NSObject {
     }
 
     fileprivate func saveFullFileEntrys() {
-        if !NSKeyedArchiver.archiveRootObject(cachedFullFileEntrys, toFile: fullFileEntrysPath) {
-            print("VideoCacheFullFileEntrysStoredError")
+        if cachedFullFileEntrys.count > 0 {
+            if !NSKeyedArchiver.archiveRootObject(cachedFullFileEntrys, toFile: fullFileEntrysPath) {
+                print("VideoCacheFullFileEntrysStoredError")
+            }
         }
     }
 

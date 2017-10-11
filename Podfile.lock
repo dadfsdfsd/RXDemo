@@ -1,0 +1,58 @@
+PODS:
+  - Alamofire (4.5.1)
+  - DynamicColor (3.3)
+  - IGListKit (3.1.1):
+    - IGListKit/Default (= 3.1.1)
+  - IGListKit/Default (3.1.1):
+    - IGListKit/Diffing
+  - IGListKit/Diffing (3.1.1)
+  - Kingfisher (4.0.1)
+  - KVOController (1.2.0)
+  - Moya (9.0.0):
+    - Moya/Core (= 9.0.0)
+  - Moya/Core (9.0.0):
+    - Alamofire (~> 4.1)
+    - Result (~> 3.0)
+  - Moya/RxSwift (9.0.0):
+    - Moya/Core
+    - RxSwift (~> 3.3)
+  - ObjectMapper (2.2.9)
+  - Result (3.2.3)
+  - RxCocoa (3.6.1):
+    - RxSwift (~> 3.6)
+  - RxDataSources (1.0.4):
+    - RxCocoa (~> 3.0)
+    - RxSwift (~> 3.0)
+  - RxSwift (3.6.1)
+  - SnapKit (4.0.0)
+
+DEPENDENCIES:
+  - DynamicColor (~> 3.3)
+  - IGListKit (~> 3.0)
+  - Kingfisher
+  - KVOController
+  - Moya
+  - Moya/RxSwift
+  - ObjectMapper
+  - RxCocoa (~> 3.0)
+  - RxDataSources (~> 1.0)
+  - RxSwift (~> 3.0)
+  - SnapKit (~> 4.0.0)
+
+SPEC CHECKSUMS:
+  Alamofire: 2d95912bf4c34f164fdfc335872e8c312acaea4a
+  DynamicColor: 3cdaa1e01c16e93ba744e0630f768373e0fc7a7d
+  IGListKit: cb97f405ae43e59fe1da74271e19427ec20d3c07
+  Kingfisher: b771785e9461ed4b8686d40e7145f9e58100cb24
+  KVOController: d72ace34afea42468329623b3379ab3cd1d286b6
+  Moya: cf5e6ee93af526532f92614004b8ad2ea60fd845
+  ObjectMapper: 63cfe41bc6f8e7c8f44344c49901b8ae7de14c52
+  Result: 128640a6347e8d2ae48b142556739a2d13f90ce6
+  RxCocoa: 84a08739ab186248c7f31ce4ee92d6f8a947d690
+  RxDataSources: b3389acc5fe2eefb8fcd81a2b76a876ad08bc82a
+  RxSwift: f9de85ea20cd2f7716ee5409fc13523dc638e4e4
+  SnapKit: a42d492c16e80209130a3379f73596c3454b7694
+
+PODFILE CHECKSUM: 28eadfb8ea4f12a36663d5bd7dc3ed4607a52b34
+
+COCOAPODS: 1.2.1

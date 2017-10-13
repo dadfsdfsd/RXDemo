@@ -10,19 +10,15 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 
-fileprivate let kScreenWidth = UIScreen.main.bounds.size.width
-fileprivate let kScreenHeight = UIScreen.main.bounds.size.height
-fileprivate let leftFullscreenOfMute: CGFloat = 10.0
-
 // 播放器的几种状态
 enum WMPlayerState {
     case failed,           // 播放失败
-         buffering,        // 缓冲中
-         readyToPlay,      // 将要播放
-         playing,          // 播放中
-         paused,           // 播放暂停
-         stopped,          // 暂停停止
-         finished          // 播放完毕
+    buffering,        // 缓冲中
+    readyToPlay,      // 将要播放
+    playing,          // 播放中
+    paused,           // 播放暂停
+    stopped,          // 暂停停止
+    finished          // 播放完毕
 }
 
 //MARK - WMPlayerDelegate
@@ -38,7 +34,7 @@ protocol WMPlayerDelegate: class {
     func singleTapped(_: WMPlayer, tap: UITapGestureRecognizer)
     // 双击WMPlayer的代理方法
     func doubleTapped(_: WMPlayer, tap: UITapGestureRecognizer)
-
+    
     /// 播放状态
     // 播放失败的代理方法
     func failedPlayWithWMPlayerStatus(_: WMPlayer, state: WMPlayerState)
@@ -49,38 +45,30 @@ protocol WMPlayerDelegate: class {
 }
 
 extension WMPlayerDelegate {
-
+    
     func clickedPlayOrPause(_ wmplayer: WMPlayer, button: UIButton) { }
-
+    
     func clickedCloseButton(_ wmplayer: WMPlayer, button: UIButton) { }
-
+    
     func clickedFullScreenButton(_ wmplayer: WMPlayer, button: UIButton) { }
-
+    
     func singleTapped(_ wmplayer: WMPlayer, tap: UITapGestureRecognizer) { }
-
+    
     func doubleTapped(_ wmplayer: WMPlayer, tap: UITapGestureRecognizer) { }
-
+    
     func failedPlayWithWMPlayerStatus(_ wmplayer: WMPlayer, state: WMPlayerState) { }
-
+    
     func readyToPlayWithWMPlayerStatus(_ wmplayer: WMPlayer, state: WMPlayerState) { }
-
+    
     func finishedPlaye(_ wmplayer: WMPlayer) { }
 }
 
 class WMPlayer: UIView {
-
-    fileprivate func WMPlayerSrcName(file: String) -> String {
-        return "WMPlayer.bundle".stringByAppendingPathComponent(file)
-    }
-
-    fileprivate func WMPlayerFrameworkSrcName(file: String) -> String {
-        return "Frameworks/WMPlayer.framework/WMPlayer.bundle".stringByAppendingPathComponent(file)
-    }
-
+    
     static var PlayViewStatusObservationContext: String = ""
-
+    
     // 播放器player
-    var player: MPAVPlayer? {
+    var player: CacheableAVPlayer? {
         willSet {
             if newValue != nil {
                 if self.player?.currentItem == nil {
@@ -124,33 +112,33 @@ class WMPlayer: UIView {
                 forwardLabel.isHidden = true
                 playOrPauseBtn_Center.alpha = 0
                 bringSubview(toFront: loadFailedView)
-
+                
             case .buffering:
                 loadFailedView.isHidden = true
                 loadingView.isHidden = false
                 finishView.isHidden = true
                 forwardLabel.isHidden = true
-
+                
             case .readyToPlay: break
-
+                
             case .playing:
                 loadFailedView.isHidden = true
                 finishView.isHidden = true
                 forwardLabel.isHidden = true
-
+                
             case .paused:
                 loadFailedView.isHidden = true
                 loadingView.isHidden = true
                 finishView.isHidden = true
                 forwardLabel.isHidden = true
-
+                
             case .stopped:
                 coverView.isHidden = false
                 loadFailedView.isHidden = true
                 loadingView.isHidden = true
                 finishView.isHidden = true
                 forwardLabel.isHidden = true
-
+                
             case .finished:
                 loadFailedView.isHidden = true
                 loadingView.isHidden = true
@@ -164,9 +152,9 @@ class WMPlayer: UIView {
     // BOOL值判断当前的状态
     @objc dynamic lazy var isFullscreen = Bool()
     // 控制全屏的按钮
-    var fullScreenBtn = WMButton(type: .custom)
+    var fullScreenBtn = HittestButton(type: .custom)
     // 静音按钮
-    var muteButton = WMButton(type: .custom)
+    var muteButton = HittestButton(type: .custom)
     // 播放暂停按钮(居中)
     lazy var playOrPauseBtn_Center = UIButton(type: .custom)
     // 显示加载失败的UILabel
@@ -182,24 +170,23 @@ class WMPlayer: UIView {
                 currentItem?.removeObserver(self, forKeyPath: "playbackBufferEmpty")
                 currentItem?.removeObserver(self, forKeyPath: "playbackLikelyToKeepUp")
             }
-
+            
             if newValue != nil {
-
-//                newValue?.kvoController.observe(self, keyPath: "status", options: .new, block: {})
+                
                 newValue?.addObserver(self, forKeyPath: "status", options: .new, context: &WMPlayer.PlayViewStatusObservationContext)
                 newValue?.addObserver(self, forKeyPath: "loadedTimeRanges", options: .new, context: &WMPlayer.PlayViewStatusObservationContext)
                 // 缓冲区空了，需要等待数据
                 newValue?.addObserver(self, forKeyPath: "playbackBufferEmpty", options: .new, context: &WMPlayer.PlayViewStatusObservationContext)
                 // 缓冲区有足够数据可以播放了
                 newValue?.addObserver(self, forKeyPath: "playbackLikelyToKeepUp", options: .new, context: &WMPlayer.PlayViewStatusObservationContext)
-
+                
                 // 添加视频播放结束通知
                 NotificationCenter.default.addObserver(self, selector: #selector(moviePlayDidEnd(notification:)), name: Notification.Name.AVPlayerItemDidPlayToEndTime, object: newValue)
             }
         }
     }
     // 菊花（加载框
-    var loadingView = WMPlayerLoadingView()
+    var loadingView = SimpleLoadingView(frame: CGRect(x: 0, y: 0, width: 52, height: 52))
     // 播放结束后的UI super view
     lazy var finishView = UIView()
     // BOOL值判断当前的播放状态
@@ -224,24 +211,26 @@ class WMPlayer: UIView {
     }
     // 跳到seekTime这个时间点播放
     lazy var seekTime: Double = 0.0
-
+    
     var isPauseByUser = Bool() {
         didSet {
             playOrPauseBtn_Center.isSelected = isPauseByUser
         }
     }
-
-    var playerData: MPAVPlayerData? {
-        willSet {
-            if playerData != newValue {
+    
+    var playerData: AVPlayerData? {
+        didSet {
+            if playerData != oldValue {
                 resetWMPlayer()
             }
-
+            
+            guard let playerData = playerData, let url = URL(string: playerData.urlString) else { return }
+            
             if player == nil {
-                player = newValue?.player
+                player = CacheableAVPlayer(url: url)
             }
             guard let player = player else { return }
-
+            
             if playerLayer == nil {
                 playerView = AVPlayerView(player: player)
                 playerLayer = (playerView?.layer as! AVPlayerLayer)
@@ -249,8 +238,8 @@ class WMPlayer: UIView {
                 insertSubview(playerView!, at: 0)
                 refreshGravity()
             }
-            videoSize = newValue?.size ?? .zero
-            seekTime = CMTimeGetSeconds((newValue?.seekTime)!)
+            videoSize = playerData.size
+            seekTime = CMTimeGetSeconds(playerData.seekTime)
             muteButton.isSelected = player.volume == 1
             muteButton2.isSelected = player.volume == 1
             isMuteForNormalState = !(player.volume > Float(0))
@@ -262,11 +251,11 @@ class WMPlayer: UIView {
             refreshGravity()
         }
     }
-
+    
     lazy var isPortrait = Bool()
-
+    
     @objc dynamic lazy var isShowControlView = Bool()
-
+    
     var hasControlView = Bool() {
         didSet {
             muteButton2.isHidden = needShowControlView()
@@ -275,7 +264,7 @@ class WMPlayer: UIView {
     }
     
     var seekCount: Int = 0
-
+    
     func refreshGravity() {
         if isFullscreen {
             if videoSize.height/videoSize.width > kScreenHeight/kScreenWidth {
@@ -293,16 +282,16 @@ class WMPlayer: UIView {
             coverView.backgroundColor = .white
         }
     }
-
+    
     fileprivate var canDrag: Bool {
         return (!isDragingSlider) && (state == .buffering || state == .paused || state == .playing || state == .readyToPlay || state == .paused)
     }
-
+    
     lazy fileprivate var originalPlaySecond = TimeInterval()
     lazy fileprivate var originalPoint = CGPoint()
     lazy fileprivate var finalPoint = CGPoint()
     lazy fileprivate var dateFormatter = DateFormatter()
-
+    
     fileprivate var videoDuration: CGFloat = 0 {
         willSet {
             if newValue != 0 {
@@ -311,9 +300,9 @@ class WMPlayer: UIView {
             }
         }
     }
-
+    
     fileprivate var playbackTimeObserver: Any?
-
+    
     lazy fileprivate var isStopByBackground = Bool()
     lazy fileprivate var isBuffering = Bool()
     lazy fileprivate var isMuteForNormalState = Bool()
@@ -324,9 +313,9 @@ class WMPlayer: UIView {
             fakeScrollView.isScrollEnabled = (!self.isDragingSlider && !disableSildeForward) || isFullscreen
         }
     }
-
+    
     lazy fileprivate var tap = UITapGestureRecognizer()
-    fileprivate var fullScreenBtn2 = WMButton(type: UIButtonType.custom)
+    fileprivate var fullScreenBtn2 = HittestButton(type: UIButtonType.custom)
     lazy fileprivate var leftTimeLabel = UILabel()
     lazy fileprivate var rightTimeLabel = UILabel()
     lazy fileprivate var forwardLabel = UILabel()
@@ -334,52 +323,52 @@ class WMPlayer: UIView {
     lazy fileprivate var gradient = CAGradientLayer()
     lazy fileprivate var loadingProgress = UIProgressView(progressViewStyle: UIProgressViewStyle.default)
     lazy fileprivate var bottomProgress = UIView()
-    fileprivate var fakeScrollView = WMProxyScrollView()
-    fileprivate var backButton = WMButton()
+    fileprivate var fakeScrollView = GestureProxyScrollView()
+    fileprivate var backButton = HittestButton()
     // 静音按钮2
-    fileprivate var muteButton2 = WMButton()
+    fileprivate var muteButton2 = HittestButton()
     lazy fileprivate var loadFailedLabel = UILabel()
     lazy fileprivate var loadFailedButton = UIButton(frame: CGRect(x: 0, y: 0, width: 220, height: 30))
-
+    
     lazy fileprivate var singleTap = UITapGestureRecognizer()
     lazy fileprivate var smallSuperView = UIView()
     lazy fileprivate var smallFrame = CGRect()
-
+    
     //MARK: - Init
-
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         initWMPlayer()
     }
-
+    
     init(frame: CGRect, supportCache: Bool) {
         super.init(frame: frame)
         self.supportCache = supportCache
-
+        
         initWMPlayer()
     }
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-
+        
         initWMPlayer()
     }
-
+    
     init() {
         super.init(frame: CGRect.zero)
         initWMPlayer()
     }
-
+    
     fileprivate func initWMPlayer() {
         hasControlView = true
         seekTime = 0.00
         isPortrait = true
         backgroundColor = .black
-
+        
         initSubViews()
-
+        
         reloadLayout(isFullScreen: false)
-
+        
         singleTap = UITapGestureRecognizer(target: self, action: #selector(handleSingleTap))
         singleTap.numberOfTapsRequired = 1
         singleTap.numberOfTouchesRequired = 1
@@ -390,12 +379,11 @@ class WMPlayer: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     func initSubViews() {
-        loadingView = WMPlayerLoadingView(frame: CGRect(x: 0, y: 0, width: 52, height: 52))
         addSubview(loadingView)
-
-        fakeScrollView = WMProxyScrollView(frame: bounds)
+        
+        fakeScrollView.frame = self.bounds
         fakeScrollView.gesEnabled = true
         fakeScrollView.showsVerticalScrollIndicator = false
         fakeScrollView.showsHorizontalScrollIndicator = false
@@ -403,34 +391,29 @@ class WMPlayer: UIView {
         addGestureRecognizer(fakeScrollView.panGestureRecognizer)
         fakeScrollView.panGestureRecognizer.addTarget(self, action: #selector(handleScrollGes(ges:)))
         fakeScrollView.isUserInteractionEnabled = false
-
-        coverView = UIImageView()
+        
         coverView.backgroundColor = .white
         coverView.contentMode = .scaleAspectFill
         addSubview(coverView)
-
-        bottomView = UIView()
+        
         bottomView.addGestureRecognizer(UITapGestureRecognizer())
         addSubview(bottomView)
-
+        
         let colorTop = UIColor(white: 0, alpha: 0)
-        let colorBottom = UIColor(white: 0, alpha: 0.4)
-
-        gradient = CAGradientLayer()
+        let colorBottom = UIColor(white: 0, alpha: 0.2)
+        
         gradient.colors = Array(arrayLiteral: colorTop.cgColor, colorBottom.cgColor)
         gradient.locations = [0, 1]
         gradient.frame = CGRect(x: 0, y: 0, width: 300, height: 300)
         bottomView.layer.insertSublayer(gradient, at: 0)
-
-        muteButton = WMButton(type: .custom)
+        
         muteButton.hitExpand = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
         muteButton.showsTouchWhenHighlighted = true
         muteButton.addTarget(self, action: #selector(onMute(sender:)), for: .touchUpInside)
         muteButton.setImage(UIImage(named: "icon_mute"), for: .normal)
         muteButton.setImage(UIImage(named: "icon_no_mute"), for: .selected)
         bottomView.addSubview(muteButton)
-
-        muteButton2 = WMButton(type: .custom)
+        
         muteButton2.hitExpand = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
         muteButton2.showsTouchWhenHighlighted = true
         muteButton2.addTarget(self, action: #selector(onMute(sender:)), for: .touchUpInside)
@@ -438,24 +421,21 @@ class WMPlayer: UIView {
         muteButton2.setImage(UIImage(named: "icon_no_mute"), for: .selected)
         muteButton2.isHidden = true
         addSubview(muteButton2)
-
-        loadingProgress = UIProgressView(progressViewStyle: .default)
+        
         loadingProgress.progressTintColor = UIColor(white: 1, alpha: 0.2)
         loadingProgress.trackTintColor = .clear
         loadingProgress.backgroundColor = .clear
         bottomView.addSubview(loadingProgress)
         loadingProgress.setProgress(0.0, animated: false)
         bottomView.sendSubview(toBack: loadingProgress)
-
-        fullScreenBtn = WMButton(type: .custom)
+        
         fullScreenBtn.hitExpand = UIEdgeInsets(top: -20, left: -20, bottom: -20, right: -20)
         fullScreenBtn.showsTouchWhenHighlighted = true
         fullScreenBtn.addTarget(self, action: #selector(fullScreenAction(sender:)), for: .touchUpInside)
         fullScreenBtn.setImage(UIImage(named: "icon_fullscreen"), for: .normal)
         fullScreenBtn.setImage(UIImage(named: "video_quit_fullscreen"), for: .selected)
         bottomView.addSubview(fullScreenBtn)
-
-        fullScreenBtn2 = WMButton(type: .custom)
+        
         fullScreenBtn2.hitExpand = UIEdgeInsets(top: -20, left: -20, bottom: -20, right: -20)
         fullScreenBtn2.showsTouchWhenHighlighted = true
         fullScreenBtn2.addTarget(self, action: #selector(fullScreenAction(sender:)), for: .touchUpInside)
@@ -463,40 +443,37 @@ class WMPlayer: UIView {
         fullScreenBtn2.setImage(UIImage(named: "video_quit_fullscreen"), for: .selected)
         addSubview(fullScreenBtn2)
         fullScreenBtn2.isHidden = true
-
-        leftTimeLabel = UILabel()
+        
         leftTimeLabel.text = "00:00"
         leftTimeLabel.textAlignment = .left
         leftTimeLabel.textColor = .white
         leftTimeLabel.backgroundColor = .clear
         leftTimeLabel.font = UIFont.systemFont(ofSize: 11)
         bottomView.addSubview(leftTimeLabel)
-
-        rightTimeLabel = UILabel()
+        
         rightTimeLabel.text = "00:00"
         rightTimeLabel.textAlignment = .right
         rightTimeLabel.textColor = .white
         rightTimeLabel.backgroundColor = .clear
         rightTimeLabel.font = UIFont.systemFont(ofSize: 11)
         bottomView.addSubview(rightTimeLabel)
-
-        progressSlider = UISlider()
+        
         progressSlider.backgroundColor = .clear
         progressSlider.minimumValue = 0.0
-        progressSlider.setThumbImage(UIImage(named: "video_dot"), for: .normal)
+        progressSlider.setThumbImage(UIImage(named: "video_dot2"), for: .normal)
         progressSlider.minimumTrackTintColor = UIColor(red: 1, green: 0, blue: 76/255, alpha: 1)
         progressSlider.maximumTrackTintColor = UIColor(white: 1, alpha: 0.2)
         progressSlider.value = 0.0
         progressSlider.addTarget(self, action: #selector(stratDragSlide(slider:)), for: .valueChanged)
         progressSlider.addTarget(self, action: #selector(updateProgress(slider:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
-
+        
         tap = UITapGestureRecognizer(target: self, action: #selector(actionTapGesture(sender:)))
         tap.delegate = self
         fakeScrollView.panGestureRecognizer.require(toFail: tap)
-
+        
         progressSlider.addGestureRecognizer(tap)
         bottomView.addSubview(progressSlider)
-
+        
         playOrPauseBtn_Center = UIButton(type: .custom)
         playOrPauseBtn_Center.showsTouchWhenHighlighted = true
         playOrPauseBtn_Center.addTarget(self, action: #selector(playOrPause(_:)), for: .touchUpInside)
@@ -504,7 +481,7 @@ class WMPlayer: UIView {
         playOrPauseBtn_Center.setImage(UIImage(named: "icon_video_play_new"), for: .selected)
         playOrPauseBtn_Center.alpha = 0
         addSubview(playOrPauseBtn_Center)
-
+        
         forwardLabel = UILabel()
         forwardLabel.isHidden = true
         forwardLabel.textColor = .white
@@ -515,11 +492,11 @@ class WMPlayer: UIView {
         forwardLabel.layer.masksToBounds = true
         forwardLabel.numberOfLines = 0
         addSubview(forwardLabel)
-
+        
         bottomProgress = UIView()
         bottomProgress.backgroundColor = UIColor(red: 1, green: 0, blue: 76/255, alpha: 1)
         addSubview(bottomProgress)
-
+        
         finishView = UIView()
         finishView.isUserInteractionEnabled = true
         let finishTap = UITapGestureRecognizer(target: self, action: #selector(onTapFinish))
@@ -527,27 +504,27 @@ class WMPlayer: UIView {
         finishView.isHidden = true
         finishView.backgroundColor = UIColor(white: 0, alpha: 0.88)
         addSubview(finishView)
-
-        backButton = WMButton()
+        
+        backButton = HittestButton()
         backButton.hitExpand = UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10)
         backButton.setImage(UIImage(named: "video_back"), for: .normal)
         backButton.addTarget(self, action: #selector(onTapBackBtn), for: .touchUpInside)
         addSubview(backButton)
-
+        
         loadFailedView = UIView()
         loadFailedView.isHidden = true
         loadFailedView.addGestureRecognizer(UITapGestureRecognizer())
         loadFailedView.isUserInteractionEnabled = true
         loadFailedView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.8)
         addSubview(loadFailedView)
-
+        
         loadFailedLabel = UILabel()
         loadFailedLabel.textAlignment = .center
         loadFailedLabel.textColor = .white
         loadFailedLabel.font = UIFont.mpLightFontOfSize(15)
         loadFailedLabel.text = "视频加载失败"
         loadFailedView.addSubview(loadFailedLabel)
-
+        
         loadFailedButton = UIButton(frame: CGRect(x: 0, y: 0, width: 220, height: 30))
         loadFailedButton.layer.borderColor = UIColor(red: 1, green: 0, blue: 76/255, alpha: 1).cgColor
         loadFailedButton.layer.cornerRadius = 4
@@ -557,7 +534,7 @@ class WMPlayer: UIView {
         loadFailedButton.addTarget(self, action: #selector(restartPlay), for: .touchUpInside)
         loadFailedButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         loadFailedView.addSubview(loadFailedButton)
-
+        
         bringSubview(toFront: loadingView)
         bringSubview(toFront: bottomView)
         bringSubview(toFront: fullScreenBtn)
@@ -565,25 +542,25 @@ class WMPlayer: UIView {
         bringSubview(toFront: playOrPauseBtn_Center)
         bringSubview(toFront: finishView)
     }
-
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
     }
-
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
     }
-
+    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
     }
-
+    
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
     }
-
-
-
+    
+    
+    
     //MARK: - 单击手势方法
     @objc fileprivate func handleSingleTap(sender: UITapGestureRecognizer) {
         delegate?.singleTapped(self, tap: sender)
@@ -593,12 +570,12 @@ class WMPlayer: UIView {
             playOrPause(playOrPauseBtn_Center)
         }
     }
-
+    
     //MARK: - 双击手势方法
     fileprivate func handleDoubleTap(doubleTap: UITapGestureRecognizer) {
         delegate?.doubleTapped(self, tap: doubleTap)
     }
-
+    
     //MARK: - Setter
     fileprivate func setCurrentTime(time: Double) {
         DispatchQueue.main.async {
@@ -606,7 +583,7 @@ class WMPlayer: UIView {
             self.seekToTime(time: Double(dragedSeconds))
         }
     }
-
+    
     fileprivate func setProgressValue(value: Double) {
         if videoDuration == 0 { return }
         if !isDragingSlider {
@@ -617,23 +594,23 @@ class WMPlayer: UIView {
         let process = value / Double(videoDuration)
         bottomProgress.frame = CGRect(x: bottomView.frame.origin.x, y: bottomView.frame.origin.y + bottomView.frame.size.height - 3, width: bottomView.frame.size.width * CGFloat(process), height: 3)
     }
-
+    
     fileprivate func refreshCurrentTime(currentTime: CGFloat) {
         setProgressValue(value: Double(currentTime))
     }
-
+    
     //MARK: - 开始点击sidle
     @objc fileprivate func stratDragSlide(slider: UISlider) {
         isDragingSlider = true
         leftTimeLabel.text = convertTime(second: CGFloat(progressSlider.value))
         setProgressValue(value: Double(slider.value))
         cancelControlViewHide()
-
+        
     }
-
+    
     //MARK: - 播放进度
     @objc fileprivate func updateProgress(slider: UISlider) {
-    
+        
         if fabsf(progressSlider.value - progressSlider.maximumValue) < 0.01 {
             moviePlayDidEnd(notification: nil)
             isDragingSlider = false
@@ -653,9 +630,9 @@ class WMPlayer: UIView {
             changeIsShowControlView(isShowControlView, animated: true)
         }
     }
-
+    
     //MARK: - KVO
-
+    
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if context == &WMPlayer.PlayViewStatusObservationContext {
             if videoSize.equalTo(.zero) {
@@ -669,19 +646,19 @@ class WMPlayer: UIView {
                     }
                 }
             }
-
+            
             guard let currentItem = currentItem else { return }
-
+            
             if keyPath == "status" {
-//                let status = change?[NSKeyValueChangeKey.newKey] as? AVPlayerItemStatus
-//                guard let status = change?[NSKeyValueChangeKey.newKey] as? AVPlayerItemStatus else { return }
+                //                let status = change?[NSKeyValueChangeKey.newKey] as? AVPlayerItemStatus
+                //                guard let status = change?[NSKeyValueChangeKey.newKey] as? AVPlayerItemStatus else { return }
                 playItemStatusHasChange(status: currentItem.status)
             } else if keyPath == "loadedTimeRanges" {
                 // 计算缓冲进度
                 let timeInterval = availableDuration()
                 let duration = currentItem.duration
                 let totalDuration = CMTimeGetSeconds(duration)
-
+                
                 // 缓冲颜色
                 loadingProgress.setProgress(Float(timeInterval/totalDuration), animated: false)
             } else if keyPath == "playbackBufferEmpty" {
@@ -698,7 +675,7 @@ class WMPlayer: UIView {
             }
         }
     }
-
+    
     fileprivate func needBuffer() -> Bool {
         if currentItem != nil {
             guard let currentItem = currentItem else { return false }
@@ -710,7 +687,7 @@ class WMPlayer: UIView {
             return false
         }
     }
-
+    
     fileprivate func playItemStatusHasChange(status: AVPlayerItemStatus) {
         switch status {
         case .unknown:
@@ -720,12 +697,12 @@ class WMPlayer: UIView {
             } else {
                 state = .buffering
             }
-
+            
         case .readyToPlay:
             if !isPauseByUser {
                 state = .playing
             }
-
+            
             guard let currentItem = currentItem else { return }
             if CMTimeGetSeconds(currentItem.duration) > 0 {
                 let _x = CMTimeGetSeconds(currentItem.duration)
@@ -734,12 +711,12 @@ class WMPlayer: UIView {
                     videoDuration = CGFloat(CMTimeGetSeconds(playerItem.duration))
                 }
             }
-
+            
             // 监听播放状态
             initTimer()
-
+            
             delegate?.readyToPlayWithWMPlayerStatus(self, state: .readyToPlay)
-
+            
             // 跳到xx秒播放视频
             if seekTime > 0 {
                 seekToTimeToPlayAtStart(time: floor(seekTime))
@@ -747,30 +724,30 @@ class WMPlayer: UIView {
                 player?.pause()
                 player?.play()
             }
-
+            
         case .failed:
             loadFailed()
         }
     }
-
+    
     fileprivate func playItemLoadedTimeRangesHasChange() {
         let timeInterval = availableDuration()
         guard let currentItem = currentItem else { return }
         let duration = currentItem.duration
         let totalDuration = CMTimeGetSeconds(duration)
-
+        
         // 缓冲颜色
         loadingProgress.setProgress(Float(timeInterval/totalDuration), animated: false)
     }
-
+    
     fileprivate func playItemPlaybackBufferEmptyHasChange() {
         guard let currentItem = currentItem else { return }
         if currentItem.isPlaybackBufferEmpty {
             state = .buffering
-
+            
         }
     }
-
+    
     // 缓冲回调
     fileprivate func loadedTimeRanges() {
         if isPlaying || state == .buffering || state == .playing || state == .readyToPlay {
@@ -792,27 +769,27 @@ class WMPlayer: UIView {
             }
         }
     }
-
+    
     //MARK: - 定时器
-
+    
     fileprivate func initTimer() {
-//        var interval: Double = 0.1
+        //        var interval: Double = 0.1
         let playerDuration = playerItemDuration()
-
+        
         if CMTIME_IS_INVALID(playerDuration) { return }
-
-//        let duration = CMTimeGetSeconds(playerDuration)
-//        if duration.isFinite {
-//            let width = progressSlider.bounds.width
-//            interval = 0.5 * duration / Double(width)
-//        }
-
+        
+        //        let duration = CMTimeGetSeconds(playerDuration)
+        //        if duration.isFinite {
+        //            let width = progressSlider.bounds.width
+        //            interval = 0.5 * duration / Double(width)
+        //        }
+        
         playbackTimeObserver = self.player?.addPeriodicTimeObserver(forInterval: CMTimeMakeWithSeconds(1, 30), queue: DispatchQueue.main) { [weak self] (time: CMTime) in
             guard let sSelf = self else { return }
             sSelf.syncScrubber()
         }
     }
-
+    
     fileprivate func seekToTime(time: Double, complation:(() -> Void)? = nil) {
         isSeekingAtStart = false
         guard let player = player else { return }
@@ -855,7 +832,7 @@ class WMPlayer: UIView {
         let newTime = dateFormatter.string(from: d)
         return newTime
     }
-
+    
     /**
      *  计算缓冲进度
      *
@@ -869,14 +846,14 @@ class WMPlayer: UIView {
         let durationSeconds = CMTimeGetSeconds(timeRange.duration)
         return startSeconds + durationSeconds                                       // 计算缓冲总进度
     }
-
+    
     func resetWMPlayer() {
         isPauseByUser = true
         recordPlayerData()
         resetUI()
         cleanPlayerResource()
     }
-
+    
     fileprivate func cleanPlayerResource() {
         videoSize = playerData?.size ?? .zero
         if playbackTimeObserver != nil {
@@ -892,7 +869,7 @@ class WMPlayer: UIView {
         videoDuration = 0
         seekCount = 0
     }
-
+    
     fileprivate func resetUI() {
         changeIsShowControlView(false, animated: false)
         setProgressValue(value: 0)
@@ -903,7 +880,7 @@ class WMPlayer: UIView {
         coverView.contentMode = .scaleAspectFill
         coverView.backgroundColor = .white
     }
-
+    
     fileprivate func recordPlayerData() {
         if currentItem != nil {
             playerData?.seekTime = (currentItem?.currentTime())!
@@ -911,7 +888,7 @@ class WMPlayer: UIView {
         guard let player = player else { return }
         playerData?.isMute = player.volume == 0
     }
-
+    
     fileprivate func syncScrubber() {
         let duration = videoDuration
         guard let player = player else { return }
@@ -919,7 +896,7 @@ class WMPlayer: UIView {
             // 若播放器已停止播放，放弃同步
             return
         }
-
+        
         if duration.isFinite {
             let nowTime = CMTimeGetSeconds(player.currentTime())
             if nowTime > 0 && !needBuffer() {
@@ -933,11 +910,11 @@ class WMPlayer: UIView {
                 }
             }
             loadingView.stopAnimating()
-
+            
             refreshCurrentTime(currentTime: CGFloat(nowTime))
         }
     }
-
+    
     /**pi
      *  跳到time处播放
      *  @param seekTime这个时刻，这个时间点
@@ -954,7 +931,7 @@ class WMPlayer: UIView {
                 time = 0
             }
             isSeekingAtStart = true
-
+            
             player.seek(to: CMTime(value: CMTimeValue(time), timescale: 1), toleranceBefore: CMTime(value: 1, timescale: 1), toleranceAfter: CMTime(value: 1, timescale: 1)) { [weak self] (Bool) in
                 guard let sSelf = self else { return }
                 sSelf.coverView.isHidden = true
@@ -963,14 +940,14 @@ class WMPlayer: UIView {
             }
         }
     }
-
+    
     func videoDurationStr() -> String {
         if videoDuration == 0 {
             return ""
         }
         return convertTime(second: videoDuration)
     }
-
+    
     fileprivate func playerItemDuration() -> CMTime {
         guard let playerItem = currentItem else { return kCMTimeInvalid }
         if playerItem.status == .readyToPlay {
@@ -978,119 +955,119 @@ class WMPlayer: UIView {
         }
         return kCMTimeInvalid
     }
-
+    
     deinit {
         resetWMPlayer()
     }
-
+    
     fileprivate func version() -> String{
         return "2.0.0"
     }
-
+    
     //MARK: - 重新布局Autolayout
     fileprivate func reloadLayout(isFullScreen: Bool) {
         fakeScrollView.gesEnabled = (!isDragingSlider && !disableSildeForward && !isFullScreen)
         fakeScrollView.isScrollEnabled = (!isDragingSlider && !disableSildeForward && !isFullScreen)
-
+        
         fullScreenBtn.isSelected = isFullScreen
         fullScreenBtn2.isSelected = isFullScreen
-
+        
         changeIsShowControlView(isShowControlView, animated: false)
-
+        
         muteButton2.isHidden = needShowControlView()
         fullScreenBtn2.isHidden = needShowControlView()
-
+        
         backButton.alpha = (!isFullScreen || isShowControlView) ? 0 : 1
-
+        
         let height = bounds.size.height
         let width = bounds.size.width
-
+        
         loadingView.center = CGPoint(x: bounds.size.width/2, y: bounds.size.height/2)
-
+        
         backButton.width = 16
         backButton.height = 26
         backButton.left = 10
         backButton.top = 10
-
+        
         bottomView.frame = CGRect(x: 0, y: height - 40, width: width, height: 40)
-
+        
         muteButton.height = 26
         muteButton.width = 26
         muteButton.left = 10
         muteButton.bottom = bottomView.height - 10
-
+        
         muteButton2.height = 26
         muteButton2.width = 26
         muteButton2.left = 10
         muteButton2.bottom = self.height - 10
-
+        
         fullScreenBtn.height = 20
         fullScreenBtn.width = 20
         fullScreenBtn.right = bottomView.width - 10
         fullScreenBtn.bottom = bottomView.height - 13
-
+        
         fullScreenBtn2.height = 20
         fullScreenBtn2.width = 20
         fullScreenBtn2.right = self.width - 10
         fullScreenBtn2.bottom = self.height - 13
-
+        
         leftTimeLabel.width = 35
         leftTimeLabel.height = 15
         leftTimeLabel.left = 45
         leftTimeLabel.bottom = bottomView.height - 15
-
+        
         rightTimeLabel.width = 35
         rightTimeLabel.height = 15
         rightTimeLabel.right = bottomView.width - 50
         rightTimeLabel.bottom = bottomView.height - 15
-
+        
         progressSlider.left = leftTimeLabel.right + 10
         progressSlider.width = rightTimeLabel.left - 10 - progressSlider.left
         progressSlider.height = 10
         progressSlider.centerY = leftTimeLabel.centerY
-
+        
         loadingProgress.width = progressSlider.width - 4
         loadingProgress.height = 2
         loadingProgress.left = progressSlider.left + 2
         loadingProgress.centerY = progressSlider.centerY
-
+        
         loadFailedView.frame = bounds
-
+        
         loadFailedLabel.height = 30
         loadFailedLabel.width  = 120
         loadFailedLabel.centerY = loadFailedView.height/2 - 20
         loadFailedLabel.centerX = loadFailedView.width/2
-
+        
         loadFailedButton.height = 30
         loadFailedButton.width  = 120
         loadFailedButton.top = loadFailedLabel.bottom + 17
         loadFailedButton.centerX = loadFailedView.width/2
-
+        
         finishView.frame = bounds
-
+        
         playOrPauseBtn_Center.height = 60
         playOrPauseBtn_Center.width = 60
         playOrPauseBtn_Center.center = CGPoint(x: width/2, y: height/2)
-
+        
         forwardLabel.height = 50
         forwardLabel.width = 160
         forwardLabel.center = CGPoint(x: width/2, y: height/2)
-
+        
         coverView.frame = bounds
-
+        
         gradient.frame = bottomView.bounds
-
+        
         loadingView.center = CGPoint(x: bounds.size.width/2, y: bounds.size.height/2)
-
+        
         let process: CGFloat = CGFloat(progressSlider.value / progressSlider.maximumValue)
         bottomProgress.frame = CGRect(x: bottomView.frame.origin.x, y: bottomView.frame.origin.y + bottomView.frame.size.height - 3, width: bottomView.frame.size.width*process, height: 3)
-
+        
         fakeScrollView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height - 60)
         fakeScrollView.contentSize = CGSize(width: fakeScrollView.bounds.size.width + 1, height: fakeScrollView.bounds.size.height)
         fakeScrollView.bounces = false
-
+        
     }
-
+    
     fileprivate func getSize(width: CGFloat, font: UIFont, text: String) -> CGSize {
         let lable = UILabel()
         lable.font = font
@@ -1099,20 +1076,20 @@ class WMPlayer: UIView {
         let size = lable.sizeThatFits(CGSize(width: width, height: 0))
         return size
     }
-
+    
     fileprivate func needShowControlView() -> Bool {
         return hasControlView || isFullscreen
     }
-
+    
     //MARK: - MP
-
+    
     func toFullScreen(interfaceOrientation: UIInterfaceOrientation) {
         isFullscreen = true
         UIApplication.shared.setStatusBarHidden(true, with: UIStatusBarAnimation.fade)
         guard let player = player  else { return }
         isMuteForNormalState = player.volume > 0 ? false : true
         setMute(isMute: false)
-        var duration: TimeInterval = 0.4
+        var duration: TimeInterval = 0.25
         if videoSize.width <= videoSize.height {
             duration = 0
         }
@@ -1125,7 +1102,7 @@ class WMPlayer: UIView {
             sSelf.superview?.layoutIfNeeded()
             }, completion: nil)
     }
-
+    
     fileprivate func toFullScreenWithInterfaceOrientation(interfaceOrientation: UIInterfaceOrientation)
     {
         
@@ -1150,27 +1127,27 @@ class WMPlayer: UIView {
         bringSubview(toFront: bottomView)
         bringSubview(toFront: muteButton)
     }
-
+    
     override func removeFromSuperview() {
         super.removeFromSuperview()
     }
-
+    
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
     }
-
+    
     func toSmallScreen() {
         setMute(isMute: isMuteForNormalState)
         toSmallScreen(animated: true)
     }
-
+    
     func toSmallScreen(animated: Bool) {
         isFullscreen = false
         UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.none)
         smallSuperView.viewController()?.view.setNeedsLayout()
         removeFromSuperview()
         isPortrait = true
-
+        
         self.smallSuperView.addSubview(self)
         let doBlock = { [weak self] in
             guard let sSelf = self else { return }
@@ -1181,10 +1158,10 @@ class WMPlayer: UIView {
             sSelf.refreshGravity()
             sSelf.reloadLayout(isFullScreen: false)
         }
-
+        
         if animated {
             muteButton.isHidden = true
-            UIView.animate(withDuration: 0.4, animations: doBlock, completion: { [weak self](finished: Bool) -> Void in
+            UIView.animate(withDuration: 0.25, animations: doBlock, completion: { [weak self](finished: Bool) -> Void in
                 guard let sSelf = self else { return }
                 sSelf.muteButton.isHidden = false
             })
@@ -1192,22 +1169,22 @@ class WMPlayer: UIView {
             doBlock()
         }
     }
-
+    
     fileprivate func loadFailed() {
         state = WMPlayerState.failed
         delegate?.failedPlayWithWMPlayerStatus(self, state: WMPlayerState.failed)
-
+        
         bringSubview(toFront: loadFailedView)
     }
-
+    
     func leftOfMuteButton() -> CGFloat {
         return 10.0
     }
-
-
+    
+    
     func play() {
         if state == .failed {
-            print("sometingwrong play")
+            debug_print("sometingwrong play")
             return
         }
         let currentTime = self.currentTime()
@@ -1228,7 +1205,7 @@ class WMPlayer: UIView {
         if currentItem.status == .readyToPlay {
             if state != .stopped {
                 if currentItem.isPlaybackBufferEmpty {
-
+                    
                     if NSFoundationVersionNumber >= NSFoundationVersionNumber10_0 {
                         state = .playing
                     } else {
@@ -1244,10 +1221,10 @@ class WMPlayer: UIView {
             restartPlay()
         }
     }
-
+    
     func pause() {
         if state == .failed {
-            print("somethingwrong pause")
+            debug_print("somethingwrong pause")
             return
         }
         if currentItem != nil {
@@ -1261,17 +1238,17 @@ class WMPlayer: UIView {
             state = .paused
         }
     }
-
+    
     func stop() {
         stopVideo()
     }
-
+    
     func stopVideo() {
         removeFromSuperview()
-        playerData = nil 
+        playerData = nil
         state = .stopped
     }
-
+    
     fileprivate func finishVideo() {
         state = .finished
         guard let player = player else { return }
@@ -1285,18 +1262,18 @@ class WMPlayer: UIView {
             sSelf.resetWMPlayer()
         }
     }
-
+    
     func suspend() {
         pause()
         resetWMPlayer()
         state = .stopped
     }
-
+    
     func currentTime() -> Double {
         guard let player = player else { return 0 }
         return CMTimeGetSeconds(player.currentTime())
     }
-
+    
     @objc func playOrPause(_ sender: UIButton?) {
         if isPauseByUser == true {
             play()
@@ -1309,7 +1286,7 @@ class WMPlayer: UIView {
         guard let sender = sender else { return }
         delegate?.clickedPlayOrPause(self, button: sender)
     }
-
+    
     @objc fileprivate func actionTapGesture(sender: UITapGestureRecognizer) {
         if isDragingSlider { return }
         let touchLocation = sender.location(in: progressSlider)
@@ -1321,20 +1298,20 @@ class WMPlayer: UIView {
         seekToTime(time: Double(dragedSeconds))
         changeIsShowControlView(isShowControlView, animated: true)
     }
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         reloadLayout(isFullScreen: isFullscreen)
         guard let playerView = playerView else { return }
         playerView.frame = bounds
     }
-
+    
     @objc fileprivate func onTapBackBtn() {
         if isFullscreen {
             toSmallScreen()
         }
     }
-
+    
     @objc fileprivate func fullScreenAction(sender: UIButton) {
         
         guard videoSize.width != 0 && videoSize.height != 0 else {
@@ -1348,33 +1325,33 @@ class WMPlayer: UIView {
             smallFrame = frame
             toFullScreen(interfaceOrientation: .landscapeRight)
         }
-
+        
         delegate?.clickedFullScreenButton(self, button: sender)
         delayControlViewHide()
     }
-
+    
     @objc fileprivate func restartPlay() {
         guard let currentItem = currentItem else { return }
         if (currentItem.asset as? AVURLAsset) != nil {
             resetWMPlayer()
             coverView.isHidden = false
-//            playerData = playerData
+            //            playerData = playerData
             state = .buffering
             play()
         }
     }
-
+    
     @objc fileprivate func onTapFinish() {
         if isFullscreen {
             toSmallScreen()
         }
     }
-
+    
     @objc fileprivate func onMute(sender: UIButton) {
         setMute(isMute: sender.isSelected)
         delayControlViewHide()
     }
-
+    
     fileprivate func setMute(isMute: Bool) {
         muteButton.isSelected = !isMute
         muteButton2.isSelected = !isMute
@@ -1386,7 +1363,7 @@ class WMPlayer: UIView {
             player.play()
         }
     }
-
+    
     fileprivate func duration() -> Double {
         guard let player = player else { return 0 }
         guard let playerItem = player.currentItem else { return 0 }
@@ -1396,19 +1373,19 @@ class WMPlayer: UIView {
             return 0
         }
     }
-
+    
     func changeIsShowControlView(_ isShowControlView: Bool, animated: Bool) {
         if !needShowControlView() {
             self.isShowControlView = false
         } else {
             self.isShowControlView = isShowControlView
         }
-
+        
         let bottomViewNeedHidden = !self.isShowControlView
         let backButtonNeedHidden = !self.isShowControlView || !isFullscreen
         let playOrPauseBtn_CenterNeedHidden = !self.isShowControlView && !isPauseByUser
         let bottomProgressNeedHidden = self.isShowControlView
-
+        
         if animated {
             UIView.animate(withDuration: 0.2) {
                 self.bottomView.alpha = bottomViewNeedHidden ? 0 : 1
@@ -1422,12 +1399,12 @@ class WMPlayer: UIView {
             playOrPauseBtn_Center.alpha = playOrPauseBtn_CenterNeedHidden ? 0 : 1
             bottomProgress.alpha = bottomProgressNeedHidden ? 0 : 1
         }
-
+        
         if self.isShowControlView && !isDragingSlider {
             delayControlViewHide()
         }
     }
-
+    
     func getFastForward() -> TimeInterval {
         var width: CGFloat = 0
         if isFullscreen {
@@ -1441,17 +1418,17 @@ class WMPlayer: UIView {
         } else {
             width = frame.size.width
         }
-
+        
         // 计算滑动的x值,可以为负数,则回退
         let move_x = finalPoint.x - originalPoint.x
         // 快进的秒数
         let second = TimeInterval((move_x / width) * CGFloat(progressSlider.maximumValue))
         return second
     }
-
+    
     @objc fileprivate func handleScrollGes(ges: UIPanGestureRecognizer) {
-        print("\(ges.state)")
-
+        debug_print("\(ges.state)")
+        
         let location = ges.location(in: self)
         guard let status = currentItem?.status else { return }
         switch ges.state {
@@ -1463,7 +1440,7 @@ class WMPlayer: UIView {
             originalPoint = location
             guard let player = player else { return }
             originalPlaySecond = CMTimeGetSeconds(player.currentTime())
-
+            
         case .changed:
             if !canDrag || !(status == AVPlayerItemStatus.readyToPlay) { return }
             finalPoint = location
@@ -1479,8 +1456,8 @@ class WMPlayer: UIView {
                 forwardLabel.isHidden = originalPoint.equalTo(finalPoint)
                 // 以屏幕宽度为基础,移动的X作为百分比
                 let forwardSecond = getFastForward()
-                print("快进: \(forwardSecond)秒")
-
+                debug_print("快进: \(forwardSecond)秒")
+                
                 var gotoSecond = CGFloat(originalPlaySecond + forwardSecond)
                 if gotoSecond < 0 {
                     gotoSecond = 0
@@ -1491,7 +1468,7 @@ class WMPlayer: UIView {
                 let allString = convertTime(second: videoDuration)
                 forwardLabel.text = "\(forwardString)/\(allString)"
             }
-
+            
         default:
             if !canDrag || !(status == AVPlayerItemStatus.readyToPlay) { return }
             if finalPoint.equalTo(CGPoint.zero) { return }
@@ -1512,22 +1489,22 @@ class WMPlayer: UIView {
             finalPoint = .zero
         }
     }
-
+    
     @objc fileprivate func moviePlayDidEnd(notification: Notification?) {
         finishVideo()
     }
-
+    
     fileprivate func cancelControlViewHide() {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(hideControlView), object: nil)
     }
-
+    
     fileprivate func delayControlViewHide() {
         if isShowControlView {
             cancelControlViewHide()
             perform(#selector(hideControlView), with: nil, afterDelay: 3)
         }
     }
-
+    
     @objc fileprivate func hideControlView() {
         UIView.animate(withDuration: 0.2) {
             self.changeIsShowControlView(false, animated: true)
@@ -1536,66 +1513,6 @@ class WMPlayer: UIView {
 }
 
 extension WMPlayer: UIGestureRecognizerDelegate {
-
-}
-
-class WMPlayerLoadingView: UIView {
-
-    fileprivate var animatingView = UIView()
-
-    func startAnimating() {
-        isHidden = false
-        guard let superview = superview else { return }
-        center = CGPoint(x: superview.bounds.size.width/2, y: superview.bounds.size.height/2)
-        if animatingView.layer.animation(forKey: "rotationAnimation") == nil {
-            addAnimation()
-        }
-    }
-
-    func stopAnimating() {
-        animatingView.layer.removeAllAnimations()
-        isHidden = true
-    }
-
-    fileprivate func addAnimation() {
-        let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
-        rotationAnimation.toValue = CGFloat.pi * 2
-        rotationAnimation.duration = 1
-        rotationAnimation.isCumulative = true
-        rotationAnimation.repeatCount = 10000
-        animatingView.layer.add(rotationAnimation, forKey: "rotationAnimation")
-    }
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        let image = UIImage(named: "icon_video_loading")
-        let imgView = UIImageView(image: image)
-        addSubview(imgView)
-
-        backgroundColor = UIColor.clear
-        animatingView = imgView
-        addAnimation()
-    }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        animatingView.frame = bounds
-    }
 }
 
-class WMProxyScrollView: UIScrollView, UIGestureRecognizerDelegate {
-    var gesEnabled: Bool?
-    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        let point = gestureRecognizer.location(in: self)
-        guard gesEnabled != nil || gesEnabled == true else { return false }
-        if bounds.contains(point) {
-            return true
-        }
-        return false
-
-    }
-}

@@ -9,7 +9,7 @@
 import Foundation
 import ObjectMapper
 
-class MPVPContentInfo: NSObject, NSCoding {
+class VideoCacheContentInfo: NSObject, NSCoding {
     var contentType: String
     var isByteRangeAccessSupported: Bool
     var contentLength: Int64

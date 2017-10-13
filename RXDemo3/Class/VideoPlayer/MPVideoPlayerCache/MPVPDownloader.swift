@@ -41,7 +41,7 @@ class MPVPURLSessionDelegateObject: NSObject {
     }
 
     deinit {
-         print("MPVPURLSessionDelegateObject deinit")
+         debug_print("MPVPURLSessionDelegateObject deinit")
     }
 }
 
@@ -103,7 +103,7 @@ class MPVPCacheUnitWorker: NSObject {
 
     // remote data request offset
     fileprivate var startOffset = 0
-    fileprivate var cacheUnits: [MPVPCacheUnit]
+    fileprivate var cacheUnits: [VideoCacheUnit]
     fileprivate var url: URL
     fileprivate var cacheWorker: MPVPCacheWorker
     weak var delegate: MPVPCacheUnitWorkerDelegate? = nil
@@ -114,35 +114,23 @@ class MPVPCacheUnitWorker: NSObject {
     fileprivate var ioQueue: DispatchQueue
 
     var notifyTime: TimeInterval = 0
-
-    fileprivate var session: URLSession {
-        get {
-            if sessionTemp == nil {
-                let configuration = URLSessionConfiguration.default
-                configuration.timeoutIntervalForRequest = downloadTimeout
-                sessionTemp = URLSession(configuration: configuration, delegate: sessionDelegateObject, delegateQueue: OperationQueue.main)
-
-            }
-            return sessionTemp!
-        }
-    }
-    private var sessionTemp: URLSession? = nil
+    
+    private var _sessionDelegateObject: MPVPURLSessionDelegateObject? = nil
 
     fileprivate var sessionDelegateObject: MPVPURLSessionDelegateObject {
         get {
-            if sessionDelegateObjectTemp == nil {
-                sessionDelegateObjectTemp = MPVPURLSessionDelegateObject(with: self)
+            if _sessionDelegateObject == nil {
+                _sessionDelegateObject = MPVPURLSessionDelegateObject(with: self)
             }
-            return sessionDelegateObjectTemp!
+            return _sessionDelegateObject!
         }
     }
-    private var sessionDelegateObjectTemp: MPVPURLSessionDelegateObject? = nil
-
+    
     deinit {
         cancel()
     }
 
-    init(with cacheUnits: [MPVPCacheUnit], url: URL, cacheWorker: MPVPCacheWorker, _ ioQueue: DispatchQueue) {
+    init(with cacheUnits: [VideoCacheUnit], url: URL, cacheWorker: MPVPCacheWorker, _ ioQueue: DispatchQueue) {
         self.cacheUnits = cacheUnits
         self.url = url
         self.cacheWorker = cacheWorker
@@ -155,9 +143,7 @@ class MPVPCacheUnitWorker: NSObject {
     }
 
     func cancel() {
-        if sessionTemp != nil {
-            session.invalidateAndCancel()
-        }
+        task?.cancel()
         isCancel = true
     }
 
@@ -180,7 +166,7 @@ class MPVPCacheUnitWorker: NSObject {
                     self.processUnits()
 
                 } else {
-                    print(error!)
+                    debug_print(error!)
                     self.delegate?.unitWorker(self, didFinishWithError: error)
                 }
             }
@@ -193,7 +179,7 @@ class MPVPCacheUnitWorker: NSObject {
             let range = "bytes=\(fromOffset)-\(endOffset)"
             request.setValue(range, forHTTPHeaderField: "Range")
             startOffset = cacheUnit.range.lowerBound
-            task = session.dataTask(with: request)
+            task =  VideoCacheSessionManager.shared.dataTask(with: request, delegate: sessionDelegateObject)
             task!.resume()
         }
     }
@@ -204,8 +190,6 @@ extension MPVPCacheUnitWorker: MPVPURLSessionDelegateObjectDelegate {
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
 
             delegate?.unitWorker(self, didReceive: response)
-
-            cacheWorker.startWritting()
 
             completionHandler(.allow)
     }
@@ -227,11 +211,8 @@ extension MPVPCacheUnitWorker: MPVPURLSessionDelegateObjectDelegate {
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-
-        cacheWorker.finishWritting()
-
+        
         self.cacheWorker.save()
-
 
         if error != nil {
             self.delegate?.unitWorker(self, didFinishWithError: error)
@@ -294,14 +275,14 @@ class MPVPDownloader: NSObject {
 
     fileprivate var cacheWorker: MPVPCacheWorker
     fileprivate var unitWorker: MPVPCacheUnitWorker? = nil
-    var info: MPVPContentInfo
+    var info: VideoCacheContentInfo
 
     fileprivate var ioQueue: DispatchQueue
     fileprivate var _lock = MutexLock(.Recursive)
 
     fileprivate var downloadToEnd = false
 
-    init(with url: URL, configuration: MPVPCacheConfiguration, _ ioQueue: DispatchQueue) {
+    init(with url: URL, configuration: VideoCacheConfiguration, _ ioQueue: DispatchQueue) {
         self.url = url
         cacheWorker = MPVPCacheWorker(with: url, configuration: configuration, ioQueue)
         info = cacheWorker.internalCacheConfiguration.contentInfo

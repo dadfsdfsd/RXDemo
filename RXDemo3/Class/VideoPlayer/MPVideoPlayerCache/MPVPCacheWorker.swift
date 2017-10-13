@@ -17,21 +17,19 @@ let kPackageLength = 204800
 
 class MPVPCacheWorker: NSObject {
 
-    fileprivate var readFileHandle: FileHandle? = nil
-    fileprivate var writeFileHandle: FileHandle? = nil
-    fileprivate var writeBytes = 0
-    fileprivate let filePath: String
-    fileprivate let url: URL
-    fileprivate var writting = true
-    fileprivate var startWriteDate: Date? = nil
-    fileprivate var ioQueue: DispatchQueue
-    var internalCacheConfiguration: MPVPCacheConfiguration = MPVPCacheConfiguration()
-
+    private var readFileHandle: FileHandle? = nil
+    private var writeFileHandle: FileHandle? = nil
+    private var writeBytes = 0
+    private let filePath: String
+    private let url: URL
+    private var ioQueue: DispatchQueue
+    
+    private(set) var internalCacheConfiguration: VideoCacheConfiguration = VideoCacheConfiguration()
 
     //MARK: - Public
-    init(with url: URL, configuration: MPVPCacheConfiguration, _ ioQueue: DispatchQueue) {
+    init(with url: URL, configuration: VideoCacheConfiguration, _ ioQueue: DispatchQueue) {
         self.ioQueue = ioQueue
-        let path = MPVPCacheConfiguration.videoCacheTemporaryPath(key: url.absoluteString)
+        let path = VideoCacheConfiguration.videoCacheTemporaryPath(key: url.absoluteString)
         self.url = url
         filePath = path
         internalCacheConfiguration = configuration
@@ -41,7 +39,7 @@ class MPVPCacheWorker: NSObject {
             readFileHandle = try FileHandle(forReadingFrom: fileURL)
             writeFileHandle = try FileHandle(forWritingTo: fileURL)
         } catch {
-            print(error)
+            debug_print(error)
         }
     }
 
@@ -60,23 +58,23 @@ class MPVPCacheWorker: NSObject {
         ioQueue.async {
             writeFileHandle.seek(toFileOffset: UInt64(range.lowerBound))
             writeFileHandle.write(data)
-
+            self.save()
             DispatchQueue.main.async {
-                self.writeBytes += data.count
-
                 self.internalCacheConfiguration.add(cacheFragment: range)
-
-                if self.internalCacheConfiguration.expectedSize == self.internalCacheConfiguration.receivedSize {
-                    print("receive complete")
+                self.writeBytes += data.count
+                self.ioQueue.async {
+                    self.internalCacheConfiguration.save()
                 }
-                self.save()
+                if self.internalCacheConfiguration.expectedSize == self.internalCacheConfiguration.receivedSize {
+                    debug_print("receive complete")
+                }
             }
         }
     }
 
     // get cacheUnits(wthere local or remote) from range
-    func cacheUnits(from range: Range<Int>) -> [MPVPCacheUnit] {
-        var units: [MPVPCacheUnit] = []
+    func cacheUnits(from range: Range<Int>) -> [VideoCacheUnit] {
+        var units: [VideoCacheUnit] = []
 
         if range.lowerBound == Int.max { return units }
 
@@ -94,7 +92,7 @@ class MPVPCacheWorker: NSObject {
                     let offsetLowerBound = intersectionRange.lowerBound+offset
                     let length = (offsetLowerBound+kPackageLength) > intersectionRange.upperBound ? (intersectionRange.upperBound - offsetLowerBound) : kPackageLength
 
-                    units.append(MPVPCacheUnit(with: .Local, range: offsetLowerBound..<(offsetLowerBound+length)))
+                    units.append(VideoCacheUnit(with: .Local, range: offsetLowerBound..<(offsetLowerBound+length)))
                 }
             } else if fragmentRange.lowerBound >= upperBound {
                 break
@@ -102,21 +100,21 @@ class MPVPCacheWorker: NSObject {
         }
 
         if units.count == 0 {
-            units.append(MPVPCacheUnit(with: .Remote, range: range))
+            units.append(VideoCacheUnit(with: .Remote, range: range))
         } else {
-            var localRemoteUnits: [MPVPCacheUnit] = []
+            var localRemoteUnits: [VideoCacheUnit] = []
             for i in 0..<units.count {
                 let unitRange = units[i].range
                 if i == 0 {
                     if range.lowerBound < unitRange.lowerBound {
-                        localRemoteUnits.append(MPVPCacheUnit(with: .Remote, range: range.lowerBound..<unitRange.lowerBound))
+                        localRemoteUnits.append(VideoCacheUnit(with: .Remote, range: range.lowerBound..<unitRange.lowerBound))
                     }
                     localRemoteUnits.append(units[i])
                 } else {
                     let lastUnit = localRemoteUnits.last!
                     let lastOffset = lastUnit.range.upperBound
                     if unitRange.lowerBound > lastOffset {
-                        localRemoteUnits.append(MPVPCacheUnit(with: .Remote, range: lastOffset..<unitRange.lowerBound))
+                        localRemoteUnits.append(VideoCacheUnit(with: .Remote, range: lastOffset..<unitRange.lowerBound))
                     }
                     localRemoteUnits.append(units[i])
                 }
@@ -124,7 +122,7 @@ class MPVPCacheWorker: NSObject {
                 if i == units.count-1 {
                     let localEndOffset = unitRange.upperBound
                     if upperBound > localEndOffset {
-                        localRemoteUnits.append(MPVPCacheUnit(with: .Remote, range: localEndOffset..<upperBound))
+                        localRemoteUnits.append(VideoCacheUnit(with: .Remote, range: localEndOffset..<upperBound))
                     }
                 }
             }
@@ -151,24 +149,6 @@ class MPVPCacheWorker: NSObject {
 
     func save() {
         writeFileHandle?.synchronizeFile()
-        internalCacheConfiguration.save()
-    }
-
-    func startWritting() {
-        if !writting {
-            NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
-        }
-        writting = true
-        startWriteDate = Date()
-        writeBytes = 0
-    }
-
-    func finishWritting() {
-        if writting {
-            writting = false
-            NotificationCenter.default.removeObserver(self)
-            guard startWriteDate != nil else { return }
-        }
     }
 
     func setFile() {
@@ -176,8 +156,4 @@ class MPVPCacheWorker: NSObject {
         self.writeFileHandle?.synchronizeFile()
     }
 
-    //MARK: - Notification
-    @objc func applicationDidEnterBackground(notification: Notification) {
-        save()
-    }
 }

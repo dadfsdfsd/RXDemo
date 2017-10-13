@@ -16,69 +16,16 @@ private enum MPVPResourceLoaderError: Error {
     case WrongURLScheme
 }
 
-//MARK: - Class ResourceLoader
-fileprivate protocol ResourceLoaderDelegate: class {
-    func resourceLoader(_ resourceLoader: ResourceLoader, request: AVAssetResourceLoadingRequest, didFailWithError error: Error?)
-}
-
-class ResourceLoader: NSObject {
-
-    fileprivate var url: URL
-    
-    weak fileprivate var delegate: ResourceLoaderDelegate? = nil
-
-    fileprivate var loadingRequestWorkers: [AVAssetResourceLoadingRequest : MPVPResourceLoadingRequestWorker]
-
-    var configuration: MPVPCacheConfiguration
-
-    var ioQueue = DispatchQueue(label: "com.meitu.meipu.videoCache.ioQueue")
-
-    init(with url: URL) {
-        self.url = url
-        let configurationPath = MPVPCacheConfiguration.videoCacheTemporaryPath(key: url.absoluteString)
-        configuration = MPVPCacheConfiguration.configuration(with: configurationPath)
-        configuration.url = url
-        loadingRequestWorkers = [:]
-    }
-
-    deinit {
-        cancelAll()
-    }
-
-    fileprivate func add(request: AVAssetResourceLoadingRequest) {
-        if loadingRequestWorkers[request] == nil {
-            let loadingRequestWorker = MPVPResourceLoadingRequestWorker(with: url, request: request, configuration: configuration, ioQueue)
-            loadingRequestWorkers[request] = loadingRequestWorker
-        }
-    }
-
-    func cancel(request: AVAssetResourceLoadingRequest) {
-        guard let worker = loadingRequestWorkers[request] else { return }
-        worker.cancel()
-        loadingRequestWorkers.removeValue(forKey: request)
-    }
-
-    func cancelAll() {
-        loadingRequestWorkers.removeAll()
-    }
-}
-
-extension ResourceLoader: MPVPResourceloadingRequestWorkerDelegate {
-    func resourceLoadingRequestWorker(_ worker: MPVPResourceLoadingRequestWorker, didCompleteWithError error: Error?) {
-        if error != nil {
-            delegate?.resourceLoader(self, request: worker.request, didFailWithError: error)
-        }
-    }
-}
-
-
 
 //MARK: - Class MPVPResourceLoader
 protocol MPVPResourceLoaderDelegate: class {
     func resourceLoaderLoad(url: URL, didFailWithError error: Error?)
 }
 
-class MPVPResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
+class AVResourceLoaderManager: NSObject, AVAssetResourceLoaderDelegate {
+    
+    static let shared: AVResourceLoaderManager = AVResourceLoaderManager()
+    
     //MARK: - private property
     fileprivate let cacheScheme = "MPVideoPlayerCache"
 
@@ -105,10 +52,14 @@ class MPVPResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
             return playerItem
 
         } catch let error as NSError {
-            print(error)
+            debug_print(error)
         }
 
         return AVPlayerItem(url: url)
+    }
+    
+    func setupPlayer(player: CacheableAVPlayer, withURL url: URL) {
+        player.replaceCurrentItem(with: playerItem(url: url))
     }
 
     func removeFor(url : URL) {
@@ -127,7 +78,6 @@ class MPVPResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
 
     deinit {
         removeAllLoaders()
-        MPVPCacheManager.sharedInstance.saveFileEntrys()
     }
 
     //MARK: - AVAssetResourceLoaderDelegate
@@ -144,7 +94,7 @@ class MPVPResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
                     loader?.delegate = self
                     loaders[resourceURL.absoluteString] = loader!
                 } catch let error as NSError {
-                    print(error)
+                    debug_print(error)
                 }
             }
             loader?.add(request: loadingRequest)
@@ -193,8 +143,8 @@ class MPVPResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
     }
 }
 
-extension MPVPResourceLoader: ResourceLoaderDelegate {
-    fileprivate func resourceLoader(_ resourceLoader: ResourceLoader, request: AVAssetResourceLoadingRequest, didFailWithError error: Error?) {
+extension AVResourceLoaderManager: ResourceLoaderDelegate {
+    func resourceLoader(_ resourceLoader: ResourceLoader, request: AVAssetResourceLoadingRequest, didFailWithError error: Error?) {
         resourceLoader.cancel(request: request)
         delegate?.resourceLoaderLoad(url: resourceLoader.url, didFailWithError: error)
     }

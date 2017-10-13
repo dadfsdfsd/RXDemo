@@ -10,7 +10,6 @@ import Foundation
 import ObjectMapper
 import CommonCrypto
 
-
 extension Range: StaticMappable {
 
     public static func objectForMapping(map: Map) -> BaseMappable? {
@@ -28,33 +27,25 @@ extension Range: StaticMappable {
 }
 
 
-class MPVPCacheConfiguration: NSObject, NSCoding {
+class VideoCacheConfiguration: NSObject, NSCoding {
     // cache path
     fileprivate let MPVideoCacheForTemporaryFile = "/VideoCacheTemporaryFile"
-    fileprivate let MPVideoCacheForFullFile = "/VideoCacheFullFile"
 
     // datarequest fill info
-    var contentInfo: MPVPContentInfo
+    var contentInfo: VideoCacheContentInfo = VideoCacheContentInfo()
 
-    var filePath = ""
-    var fileName: String
+    var filePath: String = ""
+    var fileName: String = ""
 
     // record cached range
-    var fragments: [Range<Int>]
+    var fragments: [Range<Int>] = []
 
     var url: URL?
 
     var expectedSize: Int64 = 0
     var receivedSize: Int64 = 0
-
-    var downloadInfo: [[Int64 : TimeInterval]]
-
+    
     override init() {
-        contentInfo = MPVPContentInfo()
-        fileName = ""
-        fragments = []
-        url = nil
-        downloadInfo = []
         super.init()
     }
 
@@ -62,7 +53,6 @@ class MPVPCacheConfiguration: NSObject, NSCoding {
     func encode(with aCoder: NSCoder) {
         aCoder.encode(fileName, forKey: "MPVPCFGFileName")
         aCoder.encode(fragments.toJSON(), forKey: "MPVPCFGFragments")
-        aCoder.encode(downloadInfo, forKey: "MPVPCFGDownloadInfo")
         aCoder.encode(contentInfo, forKey: "MPVPCFGContentInfo")
         aCoder.encode(url, forKey: "MPVPCFGURL")
     }
@@ -78,15 +68,10 @@ class MPVPCacheConfiguration: NSObject, NSCoding {
         } else {
             fragments = []
         }
-        if let downloadInfo = aDecoder.decodeObject(forKey: "MPVPCFGDownloadInfo") as? [[Int64 : TimeInterval]] {
-            self.downloadInfo = downloadInfo
-        } else {
-            downloadInfo = []
-        }
-        if let contentInfo = aDecoder.decodeObject(forKey: "MPVPCFGContentInfo") as? MPVPContentInfo {
+        if let contentInfo = aDecoder.decodeObject(forKey: "MPVPCFGContentInfo") as? VideoCacheContentInfo {
             self.contentInfo = contentInfo
         } else {
-            contentInfo = MPVPContentInfo()
+            contentInfo = VideoCacheContentInfo()
         }
         if let url = aDecoder.decodeObject(forKey: "MPVPCFGURL") as? URL {
             self.url = url
@@ -96,11 +81,11 @@ class MPVPCacheConfiguration: NSObject, NSCoding {
         super.init()
     }
 
-    static func configuration(with filePath: String) -> MPVPCacheConfiguration {
-        let path = MPVPCacheConfiguration.configurationFilePath(filePath)
+    static func configuration(with filePath: String) -> VideoCacheConfiguration {
+        let path = VideoCacheConfiguration.configurationFilePath(filePath)
 
-        guard let configuration = NSKeyedUnarchiver.unarchiveObject(withFile: path) as? MPVPCacheConfiguration else {
-            let configuration = MPVPCacheConfiguration()
+        guard let configuration = NSKeyedUnarchiver.unarchiveObject(withFile: path) as? VideoCacheConfiguration else {
+            let configuration = VideoCacheConfiguration()
             configuration.fileName = path.lastPathComponent
             configuration.filePath = path
             return configuration
@@ -119,26 +104,11 @@ class MPVPCacheConfiguration: NSObject, NSCoding {
         if expectedSize == 0 {
             return 0
         }
-        return Float(receivedSize/expectedSize)
-    }
-
-    //MARK: - Update
-    static func removeConfiguartion(with url: URL) {
-        do {
-            let filePath = MPVPCacheConfiguration.videoCacheTemporaryPath(key: url.absoluteString)
-            let configuartionPath = MPVPCacheConfiguration.configurationFilePath(filePath)
-            try FileManager.default.removeItem(atPath: configuartionPath)
-        } catch {
-            print(error)
-        }
+        return Float(receivedSize)/Float(expectedSize)
     }
 
     func save() {
         NSKeyedArchiver.archiveRootObject(self, toFile: self.filePath)
-
-        MPVPCacheManager.sharedInstance.addTempFileEntry(MPVPCachedFileInformation(url: url, filePath: MPVPCacheConfiguration.videoCacheTemporaryPath(key: url!.absoluteString), fileSize: receivedSize, time: Date()))
-            
-        MPVPCacheManager.sharedInstance.saveFileEntrys()
     }
 
     func add(cacheFragment fragment: Range<Int>) {
@@ -158,9 +128,11 @@ class MPVPCacheConfiguration: NSObject, NSCoding {
                         indexSet.insert(i)
                         break
                     }
-                } else if fragment.lowerBound <= fragments[i].upperBound && fragments[i].lowerBound <= fragment.upperBound {
+                }
+                else if fragment.lowerBound <= fragments[i].upperBound && fragments[i].lowerBound <= fragment.upperBound {
                     indexSet.insert(i)
-                } else if fragment.lowerBound >= fragments[i].upperBound {
+                }
+                else if fragment.lowerBound >= fragments[i].upperBound {
                     if i == count-1 {
                         indexSet.insert(i)
                     }
@@ -178,7 +150,8 @@ class MPVPCacheConfiguration: NSObject, NSCoding {
                     fragments.remove(at: $0)
                 }
                 fragments.insert(combineRange, at: indexSet.first!)
-            } else if indexSet.count == 1 {
+            }
+            else if indexSet.count == 1 {
                 let firstRange = fragments[indexSet.first!]
 
                 let expandFirstRange: Range = firstRange.lowerBound..<firstRange.upperBound+1
@@ -191,7 +164,8 @@ class MPVPCacheConfiguration: NSObject, NSCoding {
                     let combineRange: Range = lowerBound..<upperBound
                     fragments.remove(at: indexSet.first!)
                     fragments.insert(combineRange, at: indexSet.first!)
-                } else {
+                }
+                else {
                     if firstRange.lowerBound > fragment.lowerBound {
                         fragments.insert(fragment, at: indexSet.last!)
                     } else {
@@ -206,27 +180,20 @@ class MPVPCacheConfiguration: NSObject, NSCoding {
             cacheLength = cacheLength+Int64(fragments[i].count)
         }
         receivedSize = cacheLength
-        print("received: \(cacheLength)")
+        debug_print("received: \(cacheLength)")
     }
 
-    func add(downloadBytes bytes: Int64, spent time: TimeInterval) {
-        downloadInfo.append([bytes : time])
-    }
 }
 
 
 //MARK: - Cache Path
-extension MPVPCacheConfiguration {
+extension VideoCacheConfiguration {
 
     /// Get the local video cache path for all temporary video file.
     ///
     /// - Returns: The temporary file path.
     static func videoCachePathForAllTemporaryFile() -> String {
-        return MPVPCacheConfiguration().getFilePath(appendString: MPVPCacheConfiguration().MPVideoCacheForTemporaryFile)
-    }
-
-    static func videoCachePathForAllFullFile() -> String {
-        return MPVPCacheConfiguration().getFilePath(appendString: MPVPCacheConfiguration().MPVideoCacheForFullFile)
+        return VideoCacheConfiguration().getFilePath(appendString: VideoCacheConfiguration().MPVideoCacheForTemporaryFile)
     }
 
     /// Get the local video cache path for temporary video file.
@@ -245,13 +212,6 @@ extension MPVPCacheConfiguration {
         return path
     }
 
-    static func videoCacheFullPath(key: String) -> String {
-        var path = videoCachePathForAllFullFile()
-        path = path.stringByAppendingPathComponent(key.md5)
-        return path
-    }
-
-
     fileprivate func getFilePath(appendString str: String) -> String {
         let fileManager = FileManager.default
         guard let path = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last?.appending(str) else { return "" }
@@ -260,7 +220,7 @@ extension MPVPCacheConfiguration {
             do {
                 try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
             } catch let error as NSError {
-                print(error)
+                debug_print(error)
                 return ""
             }
         }

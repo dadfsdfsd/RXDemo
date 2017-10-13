@@ -13,11 +13,11 @@ import RxCocoa
 class VideoDetailViewModel: ViewModel {
     
     struct Input {
-        let playerData: Driver<MPAVPlayerData>
+        let playerData: Driver<AVPlayerData>
     }
     
     struct Output {
-        let playerData: Driver<MPAVPlayerData>
+        let playerData: Driver<AVPlayerData>
     }
     
     func transform(input: VideoDetailViewModel.Input) -> VideoDetailViewModel.Output {
@@ -33,9 +33,9 @@ class VideoDetailViewController: BaseViewController<VideoDetailViewModel> {
     override func didBind(to viewModel: VideoDetailViewModel?) {
         super.didBind(to: viewModel)
     
-        let playerData = MPAVPlayerData()
+        let playerData = AVPlayerData()
         playerData.urlString = "https://meipu1.video.meipai.com/lo1fEs_fD8mS6aaqjILGocjsStg7"
-        let playerDataDriver = Driver<MPAVPlayerData>.just(playerData)
+        let playerDataDriver = Driver<AVPlayerData>.just(playerData)
         
         viewModel?.transform(input: VideoDetailViewModel.Input.init(playerData: playerDataDriver)).playerData.drive(onNext: { (playerData) in
             self.player.playerData = playerData
@@ -49,8 +49,6 @@ class VideoDetailViewController: BaseViewController<VideoDetailViewModel> {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        MPVPCacheManager.sharedInstance.clearDisk()
         self.view.addSubview(player)
         player.frame = CGRect.init(x: 0, y: 200, width: self.view.width, height: 400    )
     }

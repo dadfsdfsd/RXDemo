@@ -8,22 +8,22 @@
 
 import Foundation
 
-enum MPVPCacheUnitStrategy {
+enum VideoCacheUnitStrategy {
     case Local
     case Remote
 }
 
-class MPVPCacheUnit: Equatable, Hashable {
+class VideoCacheUnit: Equatable, Hashable {
 
-    var strategy: MPVPCacheUnitStrategy
+    var strategy: VideoCacheUnitStrategy
     var range: Range<Int>
 
-    init(with strategy: MPVPCacheUnitStrategy, range: Range<Int>) {
+    init(with strategy: VideoCacheUnitStrategy, range: Range<Int>) {
         self.strategy = strategy
         self.range = range
     }
 
-    static func ==(lsh: MPVPCacheUnit, rhs: MPVPCacheUnit) -> Bool {
+    static func ==(lsh: VideoCacheUnit, rhs: VideoCacheUnit) -> Bool {
         return (lsh.range == rhs.range) && lsh.strategy==rhs.strategy
     }
 

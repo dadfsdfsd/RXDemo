@@ -11,14 +11,14 @@ import AVFoundation
 import UIKit
 
 protocol MPVPResourceloadingRequestWorkerDelegate: class {
-    func resourceLoadingRequestWorker(_ worker: MPVPResourceLoadingRequestWorker, didCompleteWithError: Error?)
+    func resourceLoadingRequestWorker(_ worker: VideoResourceLoadingRequestWorker, didCompleteWithError: Error?)
 }
 
 enum MPVPResourceLoadingRequestWorkerError: Error {
     case FinishError
 }
 
-class MPVPResourceLoadingRequestWorker {
+class VideoResourceLoadingRequestWorker {
 
     var url: URL
 
@@ -28,7 +28,7 @@ class MPVPResourceLoadingRequestWorker {
 
     weak var delegate: MPVPResourceloadingRequestWorkerDelegate? = nil
 
-    init(with url: URL, request: AVAssetResourceLoadingRequest, configuration: MPVPCacheConfiguration, _ ioQueue: DispatchQueue) {
+    init(with url: URL, request: AVAssetResourceLoadingRequest, configuration: VideoCacheConfiguration, _ ioQueue: DispatchQueue) {
         self.url = url
         downloader = MPVPDownloader(with: url, configuration: configuration, ioQueue)
         self.request = request
@@ -85,13 +85,13 @@ class MPVPResourceLoadingRequestWorker {
     fileprivate func responseRequest(data: Data, range: Range<Int>) {
         guard request.dataRequest != nil else { return }
         if range.lowerBound != Int(request.dataRequest!.currentOffset) {
-            print("dataResponse Error")
+            debug_print("dataResponse Error")
         }
         request.dataRequest!.respond(with: data)
     }
 }
 
-extension MPVPResourceLoadingRequestWorker: MPVPDownloaderDelegate {
+extension VideoResourceLoadingRequestWorker: MPVPDownloaderDelegate {
     func downloader(_ downloader: MPVPDownloader, didReceive response: URLResponse) {
             fullfillContentInfo()
     }

@@ -9,7 +9,8 @@
 import UIKit
 import Foundation
 
-class WMButton: UIButton {
+class HittestButton: UIButton {
+
     var hitExpand = UIEdgeInsets()
 
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {

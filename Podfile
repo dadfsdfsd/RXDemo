@@ -13,4 +13,6 @@ pod 'IGListKit', '~> 3.0'
 pod 'KVOController'
 pod 'ObjectMapper'
 pod 'DynamicColor', '~> 3.3'
+pod 'MJRefresh'
+pod 'YYKit'
 end

@@ -43,14 +43,23 @@ class MainViewController: BaseCollectionViewController<MainViewModel> {
     
     
     @objc func onTapRight() {
-
-        
-        
+ 
     }
     
     override func sectionController(_ sectionController: ListBindingSectionController<ListDiffable>, didSelectItemAt index: Int, viewModel: Any) {
         
-        self.navigationController?.pushViewController(VideoDetailViewController(), animated: true)
+        guard let _ = viewModel as? MainCellModel else { return }
+        
+        if index == 0 {
+            self.navigationController?.pushViewController(VideoDetailViewController(), animated: true)
+        }
+        else if index == 1 {
+            self.navigationController?.pushViewController(ViewlayoutTestViewController(), animated: true)
+        }
+        else if index == 2 {
+            self.navigationController?.pushViewController(LoadMoreViewController(), animated: true)
+        }
+        
         
     }
  

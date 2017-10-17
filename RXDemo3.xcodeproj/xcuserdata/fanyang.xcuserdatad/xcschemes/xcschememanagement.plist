@@ -7,7 +7,7 @@
 		<key>CommonCrypto.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>15</integer>
+			<integer>17</integer>
 		</dict>
 		<key>RXDemo3.xcscheme</key>
 		<dict>
@@ -25,17 +25,17 @@
 		<key>BF8846649AFA3198B373FC34</key>
 		<dict>
 			<key>primary</key>
-			<true />
+			<true/>
 		</dict>
 		<key>BF8846CE0D175525F5AC7D48</key>
 		<dict>
 			<key>primary</key>
-			<true />
+			<true/>
 		</dict>
 		<key>BF8849908D15B014BD513ED6</key>
 		<dict>
 			<key>primary</key>
-			<true />
+			<true/>
 		</dict>
 	</dict>
 </dict>

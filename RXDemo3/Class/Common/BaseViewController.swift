@@ -19,16 +19,16 @@ protocol ViewModel {
 }
 
 class RxViewController<ViewModel>: UIViewController {
-
+    
     var disposeBag = DisposeBag()
     
     var needBindWhenViewDidLoad: Bool = false
-
+    
     var viewModel: ViewModel? {
         willSet {
             willBind(to: newValue, oldViewModel: self.viewModel)
         }
-
+        
         didSet {
             if isViewLoaded {
                 didBind(to: viewModel)
@@ -42,7 +42,7 @@ class RxViewController<ViewModel>: UIViewController {
     func willBind(to viewModel: ViewModel?, oldViewModel: ViewModel?) {
         disposeBag = DisposeBag()
     }
-
+    
     func didBind(to viewModel: ViewModel?) {
         
     }

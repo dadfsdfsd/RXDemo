@@ -22,7 +22,7 @@ class MainViewModel: CollectionViewModel {
     }
     
     func transform(input: Input) -> Output {
-         let cellModels = (0...3).map { (i) -> MainCellModel in
+         let cellModels = ["Video", "ViewLayout", "LoadMore"].map { (i) -> MainCellModel in
                 let title = Driver<String>.from(["\(i)"])
                 return MainCellModel(title: title)
             }

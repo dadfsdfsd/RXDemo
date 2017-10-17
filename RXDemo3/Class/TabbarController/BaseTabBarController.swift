@@ -21,7 +21,7 @@ class BaseTabBarController: UITabBarController {
         let mainViewController = MainViewController()
         let mainScene = UINavigationController(rootViewController: mainViewController)
         if #available(iOS 11.0, *) {
-            mainScene.navigationBar.prefersLargeTitles = true
+            mainScene.navigationBar.prefersLargeTitles = false
         } else {
             // Fallback on earlier versions
         }
@@ -30,7 +30,7 @@ class BaseTabBarController: UITabBarController {
         let secondViewController = MainViewController()
         let secondScene = UINavigationController(rootViewController: secondViewController)
         if #available(iOS 11.0, *) {
-            secondScene.navigationBar.prefersLargeTitles = true
+            secondScene.navigationBar.prefersLargeTitles = false
         } else {
             // Fallback on earlier versions
         }

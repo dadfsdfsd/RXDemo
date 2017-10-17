@@ -25,13 +25,15 @@ protocol CollectionViewModel: ViewModel where Output: CollectionViewModelOutput 
 
 
 
-class BaseCollectionViewController<ViewModel>: BaseViewController<ViewModel>, ListAdapterDataSource, ListBindingSectionControllerSelectionDelegate where ViewModel: CollectionViewModel {
+class BaseCollectionViewController<ViewModel>: BaseViewController<ViewModel>, ListAdapterDataSource, ListBindingSectionControllerSelectionDelegate, UIScrollViewDelegate  where ViewModel: CollectionViewModel {
 
     var collectionView: UICollectionView?
     var sectionModels: [ListDiffable] = []
     
     lazy var adapter: ListAdapter = {
-        return ListAdapter(updater: ListAdapterUpdater(), viewController: self)
+        let adapter = ListAdapter(updater: ListAdapterUpdater(), viewController: self)
+        adapter.scrollViewDelegate = self
+        return adapter
     }()
     
     var cellModelToCell: [String: BaseCollectionViewCell.Type] {
@@ -39,13 +41,15 @@ class BaseCollectionViewController<ViewModel>: BaseViewController<ViewModel>, Li
     }
     
     func loadCollectionView() -> UICollectionView {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let layout = UICollectionViewFlowLayout()
+        layout.estimatedItemSize = .zero
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .automatic
         } else {
-            
         }
         collectionView.backgroundColor = UIColor.white
+        
         return collectionView
     }
 
@@ -75,16 +79,14 @@ class BaseCollectionViewController<ViewModel>: BaseViewController<ViewModel>, Li
     }
     
     override func viewDidLoad() {
+        collectionView = loadCollectionView()
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = true
-        
-        collectionView = loadCollectionView()
         
         adapter.collectionView = collectionView
         adapter.dataSource = self
         
         view.addSubview(collectionView!)
-        
         layoutCollectionView()
     }
     

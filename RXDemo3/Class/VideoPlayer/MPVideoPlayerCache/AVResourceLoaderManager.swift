@@ -26,16 +26,17 @@ class AVResourceLoaderManager: NSObject, AVAssetResourceLoaderDelegate {
     
     static let shared: AVResourceLoaderManager = AVResourceLoaderManager()
     
-    //MARK: - private property
-    fileprivate let cacheScheme = "MPVideoPlayerCache"
+    static let ioQueue = DispatchQueue(label: "com.meitu.meipu.videoCache.ioQueue")
+ 
+    private let cacheScheme = "MPVideoPlayerCache"
 
-    fileprivate var originScheme = "http"
+    private var originScheme = "http"
+    
+    private var isCancel = false
 
     weak var delegate: MPVPResourceLoaderDelegate? = nil
 
-    fileprivate var isCancel = false
-
-    var loaders: [String: ResourceLoader] = [:]
+    var loaders: [String: VideoResourceLoader] = [:]
 
     //MARK: - Public Method
     func playerItem(url: URL) -> AVPlayerItem {
@@ -90,7 +91,7 @@ class AVResourceLoaderManager: NSObject, AVAssetResourceLoaderDelegate {
                 do {
                     let originURL = try replaceScheme(url: resourceURL)
 
-                    loader = ResourceLoader(with: originURL)
+                    loader = VideoResourceLoader(with: originURL)
                     loader?.delegate = self
                     loaders[resourceURL.absoluteString] = loader!
                 } catch let error as NSError {
@@ -136,7 +137,7 @@ class AVResourceLoaderManager: NSObject, AVAssetResourceLoaderDelegate {
         return assetURL
     }
 
-    fileprivate func loader(for request: AVAssetResourceLoadingRequest) -> ResourceLoader? {
+    fileprivate func loader(for request: AVAssetResourceLoadingRequest) -> VideoResourceLoader? {
         guard let key = request.request.url else { return nil }
         guard let loader = loaders[key.absoluteString] else { return nil }
         return loader
@@ -144,7 +145,7 @@ class AVResourceLoaderManager: NSObject, AVAssetResourceLoaderDelegate {
 }
 
 extension AVResourceLoaderManager: ResourceLoaderDelegate {
-    func resourceLoader(_ resourceLoader: ResourceLoader, request: AVAssetResourceLoadingRequest, didFailWithError error: Error?) {
+    func resourceLoader(_ resourceLoader: VideoResourceLoader, request: AVAssetResourceLoadingRequest, didFailWithError error: Error?) {
         resourceLoader.cancel(request: request)
         delegate?.resourceLoaderLoad(url: resourceLoader.url, didFailWithError: error)
     }

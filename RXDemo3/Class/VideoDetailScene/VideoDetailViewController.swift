@@ -29,6 +29,7 @@ class VideoDetailViewModel: ViewModel {
 class VideoDetailViewController: BaseViewController<VideoDetailViewModel> {
     
     var player: WMPlayer = WMPlayer()
+    var player2: WMPlayer = WMPlayer()
     
     override func didBind(to viewModel: VideoDetailViewModel?) {
         super.didBind(to: viewModel)
@@ -40,6 +41,9 @@ class VideoDetailViewController: BaseViewController<VideoDetailViewModel> {
         viewModel?.transform(input: VideoDetailViewModel.Input.init(playerData: playerDataDriver)).playerData.drive(onNext: { (playerData) in
             self.player.playerData = playerData
             self.player.play()
+            
+//            self.player2.playerData = playerData
+//            self.player2.play()
         }, onCompleted: nil, onDisposed: nil).disposed(by: disposeBag)
     }
     
@@ -49,8 +53,12 @@ class VideoDetailViewController: BaseViewController<VideoDetailViewModel> {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         self.view.addSubview(player)
-        player.frame = CGRect.init(x: 0, y: 200, width: self.view.width, height: 400    )
+        player.frame = CGRect.init(x: 0, y: 100, width: self.view.width, height: 200)
+        
+//        self.view.addSubview(player2)
+//        player2.frame = CGRect.init(x: 0, y: 400, width: self.view.width, height: 200)
     }
 
     override func didReceiveMemoryWarning() {

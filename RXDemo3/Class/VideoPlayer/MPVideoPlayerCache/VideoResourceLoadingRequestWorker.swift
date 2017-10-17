@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import UIKit
 
-protocol MPVPResourceloadingRequestWorkerDelegate: class {
+protocol VideoCacheResourceloadingRequestWorkerDelegate: class {
     func resourceLoadingRequestWorker(_ worker: VideoResourceLoadingRequestWorker, didCompleteWithError: Error?)
 }
 
@@ -24,13 +24,13 @@ class VideoResourceLoadingRequestWorker {
 
     var request: AVAssetResourceLoadingRequest
 
-    var downloader: MPVPDownloader
+    var downloader: VideoDownloader
 
-    weak var delegate: MPVPResourceloadingRequestWorkerDelegate? = nil
+    weak var delegate: VideoCacheResourceloadingRequestWorkerDelegate? = nil
 
     init(with url: URL, request: AVAssetResourceLoadingRequest, configuration: VideoCacheConfiguration, _ ioQueue: DispatchQueue) {
         self.url = url
-        downloader = MPVPDownloader(with: url, configuration: configuration, ioQueue)
+        downloader = VideoDownloader(with: url, configuration: configuration, ioQueue)
         self.request = request
 
         downloader.delegate = self
@@ -91,16 +91,16 @@ class VideoResourceLoadingRequestWorker {
     }
 }
 
-extension VideoResourceLoadingRequestWorker: MPVPDownloaderDelegate {
-    func downloader(_ downloader: MPVPDownloader, didReceive response: URLResponse) {
+extension VideoResourceLoadingRequestWorker: VideoDownloaderDelegate {
+    func downloader(_ downloader: VideoDownloader, didReceive response: URLResponse) {
             fullfillContentInfo()
     }
 
-    func downloader(_ downloader: MPVPDownloader, didReceive data: Data, for range: Range<Int>) {
+    func downloader(_ downloader: VideoDownloader, didReceive data: Data, for range: Range<Int>) {
         responseRequest(data: data, range: range)
     }
 
-    func downloader(_ downloader: MPVPDownloader, didFinishedWithError error: Error?) {
+    func downloader(_ downloader: VideoDownloader, didFinishedWithError error: Error?) {
         if error == nil {
             request.finishLoading()
         } else {

@@ -592,7 +592,7 @@ class WMPlayer: UIView {
             playProgress = value
         }
         let process = value / Double(videoDuration)
-        bottomProgress.frame = CGRect(x: bottomView.frame.origin.x, y: bottomView.frame.origin.y + bottomView.frame.size.height - 3, width: bottomView.frame.size.width * CGFloat(process), height: 3)
+        loadingView.frame = CGRect(x: bottomView.frame.origin.x, y: bottomView.frame.origin.y + bottomView.frame.size.height - 3, width: bottomView.frame.size.width * CGFloat(process), height: 3)
     }
     
     fileprivate func refreshCurrentTime(currentTime: CGFloat) {
@@ -971,8 +971,6 @@ class WMPlayer: UIView {
         
         fullScreenBtn.isSelected = isFullScreen
         fullScreenBtn2.isSelected = isFullScreen
-        
-        changeIsShowControlView(isShowControlView, animated: false)
         
         muteButton2.isHidden = needShowControlView()
         fullScreenBtn2.isHidden = needShowControlView()

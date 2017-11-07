@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>17</integer>
 		</dict>
+		<key>DispatchTest.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>18</integer>
+		</dict>
 		<key>RXDemo3.xcscheme</key>
 		<dict>
 			<key>orderHint</key>

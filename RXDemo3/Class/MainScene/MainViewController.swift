@@ -11,6 +11,7 @@ import IGListKit
 import RxCocoa
 import RxSwift
 
+
 class MainViewController: BaseCollectionViewController<MainViewModel> {
     
     lazy var rightBtn: UIBarButtonItem = {
@@ -38,6 +39,8 @@ class MainViewController: BaseCollectionViewController<MainViewModel> {
         
         self.title = "HOME"
         self.navigationItem.rightBarButtonItem = rightBtn
+        
+        
     }
     
     
@@ -51,7 +54,9 @@ class MainViewController: BaseCollectionViewController<MainViewModel> {
         guard let _ = viewModel as? MainCellModel else { return }
         
         if index == 0 {
-            self.navigationController?.pushViewController(VideoDetailViewController(), animated: true)
+            let vc = PlayerContainerViewController()
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
         }
         else if index == 1 {
             self.navigationController?.pushViewController(ViewlayoutTestViewController(), animated: true)
@@ -59,7 +64,9 @@ class MainViewController: BaseCollectionViewController<MainViewModel> {
         else if index == 2 {
             self.navigationController?.pushViewController(LoadMoreViewController(), animated: true)
         }
-        
+        else if index == 3 {
+            self.navigationController?.pushViewController(QYSDK.shared().sessionViewController(), animated: true)
+        }
         
     }
  

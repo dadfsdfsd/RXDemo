@@ -48,6 +48,8 @@
 		A6C72FF81F94891E006581AD /* LoadMoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C72FF71F94891E006581AD /* LoadMoreViewController.swift */; };
 		A6C72FFB1F9499DF006581AD /* LoadMoreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C72FFA1F9499DF006581AD /* LoadMoreCell.swift */; };
 		A6C72FFE1F94AE50006581AD /* RefreshFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C72FFD1F94AE50006581AD /* RefreshFooter.swift */; };
+		A6CE980E1FB060DA00BF2960 /* PlayerContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE980D1FB060DA00BF2960 /* PlayerContainerViewController.swift */; };
+		A6CE98101FB1546300BF2960 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE980F1FB1546300BF2960 /* Player.swift */; };
 		A6D299981F8F16E80096359B /* video_quit_fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D2995D1F8F16E70096359B /* video_quit_fullscreen@2x.png */; };
 		A6D299991F8F16E80096359B /* video_quit_fullscreen@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D2995E1F8F16E70096359B /* video_quit_fullscreen@3x.png */; };
 		A6D2999B1F8F16E80096359B /* icon_video_play_new@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D299611F8F16E70096359B /* icon_video_play_new@2x.png */; };
@@ -72,6 +74,8 @@
 		A6D299C01F8F16E80096359B /* icon_video_loading@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D299921F8F16E80096359B /* icon_video_loading@2x.png */; };
 		A6D299C21F8F16E80096359B /* icon_video_pause_new@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D299951F8F16E80096359B /* icon_video_pause_new@2x.png */; };
 		A6D299C31F8F16E80096359B /* icon_video_pause_new@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D299961F8F16E80096359B /* icon_video_pause_new@3x.png */; };
+		A6DE5CE91FA9F0CC00CAA5D8 /* Array+.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6DE5CE81FA9F0CC00CAA5D8 /* Array+.swift */; };
+		A6E00A011F98CB5F00C871EC /* QYViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E00A001F98CB5F00C871EC /* QYViewController.swift */; };
 		A6EF964F1F8F3CE4008C461E /* VideoSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EF964E1F8F3CE4008C461E /* VideoSessionManager.swift */; };
 		A6EF96511F8F4F08008C461E /* Debug_print.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EF96501F8F4F08008C461E /* Debug_print.swift */; };
 		BF88402B265283D62BAF8B37 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF88495DF2CE683BFD284322 /* Assets.xcassets */; };
@@ -157,6 +161,7 @@
 		A632FAFC1F72647300A4A8E7 /* FMDB.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FMDB.framework; sourceTree = "<group>"; };
 		A632FAFE1F72649500A4A8E7 /* RxSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RxSwift.framework; sourceTree = "<group>"; };
 		A632FAFF1F7264AF00A4A8E7 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Alamofire.framework; sourceTree = "<group>"; };
+		A63617221FA2C24C00DB72E1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A63F657D1F8CC5FA0058A4FE /* MainSceneCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSceneCell.swift; sourceTree = "<group>"; };
 		A6582DA21F738BAC0083205F /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		A6582DA41F738BAC0083205F /* Kingfish+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Kingfish+Rx.swift"; sourceTree = "<group>"; };
@@ -190,11 +195,14 @@
 		A6A67C421F8C69EB003DE061 /* BaseTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTabBarController.swift; sourceTree = "<group>"; };
 		A6A67C451F8C6DC9003DE061 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		A6A67C481F8C6E00003DE061 /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		A6B3C9191FA47E5F00051667 /* RXDemo3.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RXDemo3.entitlements; sourceTree = "<group>"; };
 		A6C1214C1F727E1C0026A965 /* ReactiveSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ReactiveSwift.h; path = Carthage/Build/iOS/ReactiveSwift.framework/Headers/ReactiveSwift.h; sourceTree = "<group>"; };
 		A6C72FF51F94890D006581AD /* LoadMoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadMoreViewModel.swift; sourceTree = "<group>"; };
 		A6C72FF71F94891E006581AD /* LoadMoreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadMoreViewController.swift; sourceTree = "<group>"; };
 		A6C72FFA1F9499DF006581AD /* LoadMoreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadMoreCell.swift; sourceTree = "<group>"; };
 		A6C72FFD1F94AE50006581AD /* RefreshFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshFooter.swift; sourceTree = "<group>"; };
+		A6CE980D1FB060DA00BF2960 /* PlayerContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerContainerViewController.swift; sourceTree = "<group>"; };
+		A6CE980F1FB1546300BF2960 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		A6D2995D1F8F16E70096359B /* video_quit_fullscreen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "video_quit_fullscreen@2x.png"; sourceTree = "<group>"; };
 		A6D2995E1F8F16E70096359B /* video_quit_fullscreen@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "video_quit_fullscreen@3x.png"; sourceTree = "<group>"; };
 		A6D299611F8F16E70096359B /* icon_video_play_new@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_video_play_new@2x.png"; sourceTree = "<group>"; };
@@ -219,6 +227,8 @@
 		A6D299921F8F16E80096359B /* icon_video_loading@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_video_loading@2x.png"; sourceTree = "<group>"; };
 		A6D299951F8F16E80096359B /* icon_video_pause_new@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_video_pause_new@2x.png"; sourceTree = "<group>"; };
 		A6D299961F8F16E80096359B /* icon_video_pause_new@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_video_pause_new@3x.png"; sourceTree = "<group>"; };
+		A6DE5CE81FA9F0CC00CAA5D8 /* Array+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+.swift"; sourceTree = "<group>"; };
+		A6E00A001F98CB5F00C871EC /* QYViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QYViewController.swift; sourceTree = "<group>"; };
 		A6EF964E1F8F3CE4008C461E /* VideoSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoSessionManager.swift; sourceTree = "<group>"; };
 		A6EF96501F8F4F08008C461E /* Debug_print.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug_print.swift; sourceTree = "<group>"; };
 		B48A9344D941B24AB1A1C1D9 /* Pods-RXDemo3.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RXDemo3.release.xcconfig"; path = "Pods/Target Support Files/Pods-RXDemo3/Pods-RXDemo3.release.xcconfig"; sourceTree = "<group>"; };
@@ -333,9 +343,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A63617211FA2C24C00DB72E1 /* DispatchTest */ = {
+			isa = PBXGroup;
+			children = (
+				A63617221FA2C24C00DB72E1 /* main.swift */,
+			);
+			path = DispatchTest;
+			sourceTree = "<group>";
+		};
 		A6582DA01F738BAC0083205F /* Class */ = {
 			isa = PBXGroup;
 			children = (
+				A6CE980A1FB05F4200BF2960 /* NewVideoPlayer */,
 				A6C72FFC1F94AE2B006581AD /* Widget */,
 				A6C72FF41F9488EA006581AD /* LoadMoreScene */,
 				A624B3371F90BBD10097B5BA /* ViewLayoutScene */,
@@ -343,6 +362,7 @@
 				A68FCD841F8DC05600375BA7 /* Category */,
 				A68FCD421F8DBDDA00375BA7 /* VideoPlayer */,
 				A68FCD1C1F8DB86F00375BA7 /* VideoDetailScene */,
+				A6E009FF1F98CA9700C871EC /* QiYu */,
 				A6A67C471F8C6DEB003DE061 /* SecondScene */,
 				A6A67C441F8C6DC9003DE061 /* MainScene */,
 				A6A67C411F8C694C003DE061 /* TabbarController */,
@@ -419,6 +439,7 @@
 				A68FCD851F8DC05600375BA7 /* UIView+Geometry.swift */,
 				A68FCDBC1F8DD60600375BA7 /* UIView+.swift */,
 				A61587D61F95A138003D8F98 /* CGRect+.swift */,
+				A6DE5CE81FA9F0CC00CAA5D8 /* Array+.swift */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -494,6 +515,15 @@
 				A6C72FFD1F94AE50006581AD /* RefreshFooter.swift */,
 			);
 			path = Widget;
+			sourceTree = "<group>";
+		};
+		A6CE980A1FB05F4200BF2960 /* NewVideoPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				A6CE980F1FB1546300BF2960 /* Player.swift */,
+				A6CE980D1FB060DA00BF2960 /* PlayerContainerViewController.swift */,
+			);
+			path = NewVideoPlayer;
 			sourceTree = "<group>";
 		};
 		A6D2995B1F8F16C90096359B /* Resource */ = {
@@ -623,6 +653,14 @@
 			path = icon_video_pause_new.imageset;
 			sourceTree = "<group>";
 		};
+		A6E009FF1F98CA9700C871EC /* QiYu */ = {
+			isa = PBXGroup;
+			children = (
+				A6E00A001F98CB5F00C871EC /* QYViewController.swift */,
+			);
+			path = QiYu;
+			sourceTree = "<group>";
+		};
 		BF88466CC2FDEA99E531E6D6 /* RXDemo3UITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -661,6 +699,7 @@
 			children = (
 				A68FCD961F8DC33100375BA7 /* CommonCrypto */,
 				A68FCDA31F8DC33100375BA7 /* CommonCryptoTests */,
+				A63617211FA2C24C00DB72E1 /* DispatchTest */,
 				BF884B4A8D58235E2A005B78 /* Products */,
 				BF884BCAAEEB4E90E5A3CF05 /* RXDemo3 */,
 				BF88484EBDE0D2A464FD6795 /* RXDemo3Tests */,
@@ -684,6 +723,7 @@
 		BF884BCAAEEB4E90E5A3CF05 /* RXDemo3 */ = {
 			isa = PBXGroup;
 			children = (
+				A6B3C9191FA47E5F00051667 /* RXDemo3.entitlements */,
 				A6582DA01F738BAC0083205F /* Class */,
 				BF884698FF9100F20E72245E /* Info.plist */,
 				BF88495DF2CE683BFD284322 /* Assets.xcassets */,
@@ -797,8 +837,14 @@
 						ProvisioningStyle = Automatic;
 					};
 					BF8846CE0D175525F5AC7D48 = {
-						DevelopmentTeam = 38ZQL3RGUG;
+						DevelopmentTeam = 27ZA7NMK35;
 						LastSwiftMigration = 0900;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -951,6 +997,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A68FCD6E1F8DBDDA00375BA7 /* VideoCacheWorker.swift in Sources */,
+				A6DE5CE91FA9F0CC00CAA5D8 /* Array+.swift in Sources */,
 				A6A67C491F8C6E00003DE061 /* SecondViewController.swift in Sources */,
 				A68FCD751F8DBDDA00375BA7 /* VideoCacheContentInfo.swift in Sources */,
 				A68FCD6D1F8DBDDA00375BA7 /* VideoDownloader.swift in Sources */,
@@ -967,6 +1014,7 @@
 				A6C72FF61F94890D006581AD /* LoadMoreViewModel.swift in Sources */,
 				A68FCD731F8DBDDA00375BA7 /* VideoCacheConfiguration.swift in Sources */,
 				A68FCDBD1F8DD60600375BA7 /* UIView+.swift in Sources */,
+				A6CE98101FB1546300BF2960 /* Player.swift in Sources */,
 				A68FCDB71F8DC7F400375BA7 /* MetuxLock.swift in Sources */,
 				A63F657E1F8CC5FA0058A4FE /* MainSceneCell.swift in Sources */,
 				A68FCD711F8DBDDA00375BA7 /* AVResourceLoaderManager.swift in Sources */,
@@ -974,6 +1022,7 @@
 				A6C72FFB1F9499DF006581AD /* LoadMoreCell.swift in Sources */,
 				A6A67C431F8C69EB003DE061 /* BaseTabBarController.swift in Sources */,
 				A677F3D61F90A2D600FEAE5A /* VideoSessionDelegateObject.swift in Sources */,
+				A6CE980E1FB060DA00BF2960 /* PlayerContainerViewController.swift in Sources */,
 				BF8841F852550223F70BCD57 /* AppDelegate.swift in Sources */,
 				A624B33C1F90BC100097B5BA /* ViewlayoutTestViewController.swift in Sources */,
 				A68FCD881F8DC12600375BA7 /* String+.swift in Sources */,
@@ -990,6 +1039,7 @@
 				A620F2361F8C9903009172DF /* MainViewModel.swift in Sources */,
 				BF88491D3D500C59A9E293B9 /* WMPlayer.swift in Sources */,
 				BF8841541680DDB51FA00043 /* HittestButton.swift in Sources */,
+				A6E00A011F98CB5F00C871EC /* QYViewController.swift in Sources */,
 				BF884AB16598795163FB6A61 /* CacheableAVPlayer.swift in Sources */,
 				BF8845BE1E683A4C7B764077 /* GestureProxyScrollView.swift in Sources */,
 				BF884202D79C2102417EEE71 /* AVPlayerData.swift in Sources */,
@@ -1191,8 +1241,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RXDemo3/RXDemo3.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 38ZQL3RGUG;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 27ZA7NMK35;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -1200,8 +1253,9 @@
 				);
 				INFOPLIST_FILE = RXDemo3/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = RXDemo.RXDemo3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.RXDemo33.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "RXDemo3/Class/Common/RXDemo3-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 			};
@@ -1213,8 +1267,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RXDemo3/RXDemo3.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 38ZQL3RGUG;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 27ZA7NMK35;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -1222,8 +1279,10 @@
 				);
 				INFOPLIST_FILE = RXDemo3/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = RXDemo.RXDemo3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.RXDemo33.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "RXDemo3/Class/Common/RXDemo3-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;

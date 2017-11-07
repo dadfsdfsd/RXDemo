@@ -34,7 +34,7 @@ class LoadMoreViewModel: CollectionViewModel {
         }
         
         let cellModels = input.loadMoreTrigger.flatMapLatest { (_)  -> Driver<[Int]> in
-            return Observable<[Int]>.of([Int](0...9)).delay(0.01, scheduler: MainScheduler.instance).asDriver(onErrorJustReturn: [])
+            return Observable<[Int]>.of([Int](0...9)).delay(3, scheduler: MainScheduler.instance).asDriver(onErrorJustReturn: [])
             }.do(onNext: { (_) in
                 footerState.on(.next(.idle))
             })

@@ -11,9 +11,7 @@ import SnapKit
 import IGListKit
 
 protocol CollectionViewModelOutput {
-
     var sectionModels: Driver<[SectionModel]> { get }
-
 }
 
 

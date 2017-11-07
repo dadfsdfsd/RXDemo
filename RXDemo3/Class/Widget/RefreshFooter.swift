@@ -248,19 +248,6 @@ class RefreshAutoFooter : MJRefreshAutoFooter {
         self.mj_y = max(contentHeight, scrollHeight);
     }
     
-    override func willMove(toSuperview newSuperview: UIView?) {
-        super.willMove(toSuperview: newSuperview)
-        
-        if newSuperview != nil { // 新的父控件
-            if !self.isHidden {
-                self.scrollView?.mj_insetB -= self.mj_h;
-            }
-        } else { // 被移除了
-            if !self.isHidden {
-                self.scrollView?.mj_insetB += self.mj_h;
-            }
-        }
-    }
     
     override func scrollViewContentOffsetDidChange(_ change: [AnyHashable : Any]!) {
         guard let scrollView = scrollView else { return }

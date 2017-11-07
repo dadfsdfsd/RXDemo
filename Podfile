@@ -15,4 +15,5 @@ pod 'ObjectMapper'
 pod 'DynamicColor', '~> 3.3'
 pod 'MJRefresh'
 pod 'YYKit'
+pod 'QIYU_iOS_SDK', '~> 3.10'
 end

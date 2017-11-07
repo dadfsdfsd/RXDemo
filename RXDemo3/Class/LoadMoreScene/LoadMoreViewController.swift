@@ -12,6 +12,9 @@ import RxSwift
 import RxCocoa
 import IGListKit
 
+
+
+
 extension Reactive where Base: MJRefreshComponent {
    
     var state: UIBindingObserver<Base, MJRefreshState> {
@@ -55,6 +58,18 @@ class LoadMoreViewController: BaseCollectionViewController<LoadMoreViewModel> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
+    @objc func onStatusBarChange() {
+        debug_print("onStatusBarChange")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     @objc func scrollViewDidScroll(_ scrollView: UIScrollView) {

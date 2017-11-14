@@ -49,7 +49,11 @@
 		A6C72FFB1F9499DF006581AD /* LoadMoreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C72FFA1F9499DF006581AD /* LoadMoreCell.swift */; };
 		A6C72FFE1F94AE50006581AD /* RefreshFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C72FFD1F94AE50006581AD /* RefreshFooter.swift */; };
 		A6CE980E1FB060DA00BF2960 /* PlayerContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE980D1FB060DA00BF2960 /* PlayerContainerViewController.swift */; };
-		A6CE98101FB1546300BF2960 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE980F1FB1546300BF2960 /* Player.swift */; };
+		A6CE98101FB1546300BF2960 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE980F1FB1546300BF2960 /* PlayerView.swift */; };
+		A6CE98141FB303C600BF2960 /* CommonPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE98131FB303C600BF2960 /* CommonPlayerView.swift */; };
+		A6CE98161FB30A2A00BF2960 /* DelayedProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE98151FB30A2A00BF2960 /* DelayedProperty.swift */; };
+		A6CE98181FB3ECAA00BF2960 /* PlayerControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE98171FB3ECAA00BF2960 /* PlayerControlView.swift */; };
+		A6CE981A1FB4476200BF2960 /* PlayerFinishView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CE98191FB4476200BF2960 /* PlayerFinishView.swift */; };
 		A6D299981F8F16E80096359B /* video_quit_fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D2995D1F8F16E70096359B /* video_quit_fullscreen@2x.png */; };
 		A6D299991F8F16E80096359B /* video_quit_fullscreen@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D2995E1F8F16E70096359B /* video_quit_fullscreen@3x.png */; };
 		A6D2999B1F8F16E80096359B /* icon_video_play_new@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6D299611F8F16E70096359B /* icon_video_play_new@2x.png */; };
@@ -202,7 +206,11 @@
 		A6C72FFA1F9499DF006581AD /* LoadMoreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadMoreCell.swift; sourceTree = "<group>"; };
 		A6C72FFD1F94AE50006581AD /* RefreshFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshFooter.swift; sourceTree = "<group>"; };
 		A6CE980D1FB060DA00BF2960 /* PlayerContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerContainerViewController.swift; sourceTree = "<group>"; };
-		A6CE980F1FB1546300BF2960 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		A6CE980F1FB1546300BF2960 /* PlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		A6CE98131FB303C600BF2960 /* CommonPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonPlayerView.swift; sourceTree = "<group>"; };
+		A6CE98151FB30A2A00BF2960 /* DelayedProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedProperty.swift; sourceTree = "<group>"; };
+		A6CE98171FB3ECAA00BF2960 /* PlayerControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControlView.swift; sourceTree = "<group>"; };
+		A6CE98191FB4476200BF2960 /* PlayerFinishView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerFinishView.swift; sourceTree = "<group>"; };
 		A6D2995D1F8F16E70096359B /* video_quit_fullscreen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "video_quit_fullscreen@2x.png"; sourceTree = "<group>"; };
 		A6D2995E1F8F16E70096359B /* video_quit_fullscreen@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "video_quit_fullscreen@3x.png"; sourceTree = "<group>"; };
 		A6D299611F8F16E70096359B /* icon_video_play_new@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_video_play_new@2x.png"; sourceTree = "<group>"; };
@@ -304,9 +312,17 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		A6092D201FB97D400025A675 /* views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = views;
+			sourceTree = "<group>";
+		};
 		A624B3371F90BBD10097B5BA /* ViewLayoutScene */ = {
 			isa = PBXGroup;
 			children = (
+				A6092D201FB97D400025A675 /* views */,
 				A624B33B1F90BC100097B5BA /* ViewlayoutTestViewController.swift */,
 			);
 			path = ViewLayoutScene;
@@ -520,8 +536,12 @@
 		A6CE980A1FB05F4200BF2960 /* NewVideoPlayer */ = {
 			isa = PBXGroup;
 			children = (
-				A6CE980F1FB1546300BF2960 /* Player.swift */,
+				A6CE980F1FB1546300BF2960 /* PlayerView.swift */,
 				A6CE980D1FB060DA00BF2960 /* PlayerContainerViewController.swift */,
+				A6CE98131FB303C600BF2960 /* CommonPlayerView.swift */,
+				A6CE98151FB30A2A00BF2960 /* DelayedProperty.swift */,
+				A6CE98171FB3ECAA00BF2960 /* PlayerControlView.swift */,
+				A6CE98191FB4476200BF2960 /* PlayerFinishView.swift */,
 			);
 			path = NewVideoPlayer;
 			sourceTree = "<group>";
@@ -837,12 +857,12 @@
 						ProvisioningStyle = Automatic;
 					};
 					BF8846CE0D175525F5AC7D48 = {
-						DevelopmentTeam = 27ZA7NMK35;
+						DevelopmentTeam = 38ZQL3RGUG;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Push = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -1005,6 +1025,7 @@
 				A68FCDBA1F8DC89100375BA7 /* UIColor+Mp.swift in Sources */,
 				A68FCD1E1F8DB8B000375BA7 /* VideoDetailViewController.swift in Sources */,
 				A68FCD721F8DBDDA00375BA7 /* VideoResourceLoadingRequestWorker.swift in Sources */,
+				A6CE98161FB30A2A00BF2960 /* DelayedProperty.swift in Sources */,
 				A612E8A31F9066B1006BCE7D /* VideoResourceLoader.swift in Sources */,
 				A68FCDBB1F8DC89100375BA7 /* UIFont+Mp.swift in Sources */,
 				A6C72FFE1F94AE50006581AD /* RefreshFooter.swift in Sources */,
@@ -1014,7 +1035,7 @@
 				A6C72FF61F94890D006581AD /* LoadMoreViewModel.swift in Sources */,
 				A68FCD731F8DBDDA00375BA7 /* VideoCacheConfiguration.swift in Sources */,
 				A68FCDBD1F8DD60600375BA7 /* UIView+.swift in Sources */,
-				A6CE98101FB1546300BF2960 /* Player.swift in Sources */,
+				A6CE98101FB1546300BF2960 /* PlayerView.swift in Sources */,
 				A68FCDB71F8DC7F400375BA7 /* MetuxLock.swift in Sources */,
 				A63F657E1F8CC5FA0058A4FE /* MainSceneCell.swift in Sources */,
 				A68FCD711F8DBDDA00375BA7 /* AVResourceLoaderManager.swift in Sources */,
@@ -1030,12 +1051,15 @@
 				A6582DA91F738BAC0083205F /* DataProvider.swift in Sources */,
 				A6582DA71F738BAC0083205F /* BaseViewController.swift in Sources */,
 				A6C72FF81F94891E006581AD /* LoadMoreViewController.swift in Sources */,
+				A6CE98181FB3ECAA00BF2960 /* PlayerControlView.swift in Sources */,
 				A61587D71F95A138003D8F98 /* CGRect+.swift in Sources */,
 				BF884AEA48C43DEB489C52F6 /* BaseCollectionViewController.swift in Sources */,
 				A68FCD861F8DC05600375BA7 /* UIView+Geometry.swift in Sources */,
 				BF884C1BC7617529F02E90F9 /* SecionModel.swift in Sources */,
 				BF8843CB577C98CE71DF91A6 /* CellModel.swift in Sources */,
 				A6A67C461F8C6DC9003DE061 /* MainViewController.swift in Sources */,
+				A6CE981A1FB4476200BF2960 /* PlayerFinishView.swift in Sources */,
+				A6CE98141FB303C600BF2960 /* CommonPlayerView.swift in Sources */,
 				A620F2361F8C9903009172DF /* MainViewModel.swift in Sources */,
 				BF88491D3D500C59A9E293B9 /* WMPlayer.swift in Sources */,
 				BF8841541680DDB51FA00043 /* HittestButton.swift in Sources */,
@@ -1241,11 +1265,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = RXDemo3/RXDemo3.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 27ZA7NMK35;
+				DEVELOPMENT_TEAM = 38ZQL3RGUG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -1253,7 +1276,7 @@
 				);
 				INFOPLIST_FILE = RXDemo3/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.RXDemo33.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.RXDemo333.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "RXDemo3/Class/Common/RXDemo3-Bridging-Header.h";
@@ -1267,11 +1290,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = RXDemo3/RXDemo3.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 27ZA7NMK35;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 38ZQL3RGUG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -1279,7 +1302,7 @@
 				);
 				INFOPLIST_FILE = RXDemo3/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.RXDemo33.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.RXDemo333.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

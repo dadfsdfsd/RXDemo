@@ -232,7 +232,8 @@ class WMPlayer: UIView {
             guard let player = player else { return }
             
             if playerLayer == nil {
-                playerView = AVPlayerView(player: player)
+                playerView = AVPlayerView()
+                playerView?.playerLayer.player = player
                 playerLayer = (playerView?.layer as! AVPlayerLayer)
                 playerView?.frame = bounds
                 insertSubview(playerView!, at: 0)

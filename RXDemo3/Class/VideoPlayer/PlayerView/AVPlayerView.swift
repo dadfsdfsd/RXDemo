@@ -7,19 +7,20 @@ import Foundation
 import AVFoundation
 import UIKit
 
-class AVPlayerView: UIView {
+//class AVPlayerView: UIView {
+//
+//    override class var layerClass: AnyClass {
+//        return AVPlayerLayer.self
+//    }
+//
+//    init(player: AVPlayer) {
+//        super.init(frame: .zero)
+//        (self.layer as? AVPlayerLayer)?.player = player
+//    }
+//
+//    required init?(coder aDecoder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//
+//}
 
-    override class var layerClass: AnyClass {
-        return AVPlayerLayer.self
-    }
-
-    init(player: AVPlayer) {
-        super.init(frame: .zero)
-        (self.layer as? AVPlayerLayer)?.player = player
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-}

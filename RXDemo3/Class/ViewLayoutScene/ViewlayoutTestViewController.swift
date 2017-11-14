@@ -11,6 +11,36 @@ import RxSwift
 import RxCocoa
 import SnapKit
 
+class SnapKitTestView: UIView {
+    
+    var greenView = UIView()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        self.backgroundColor = UIColor.red
+        
+        greenView.backgroundColor = UIColor.green
+        self.addSubview(greenView)
+
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let width = self.bounds.width
+        let height = self.bounds.height
+    
+        greenView.frame = CGRect(0, 0, width, height)
+    }
+    
+    
+    
+}
 
 class PresentTestViewController : UIViewController {
     
@@ -129,12 +159,18 @@ class CurveLayerView: UIView {
             return
         }
         
+        var newAnimated = false
+        if UIView.inheritedAnimationDuration > 0.1{
+            newAnimated = true
+        }
+        
+        
         var transform = CGAffineTransform.identity
         let translatedY = y - self.layer.position.y + self.bounds.height/2 * scaleY
         transform = transform.translatedBy(x: 1, y: translatedY)
         transform = transform.scaledBy(x: 1, y: scaleY)
    
-        if animated {
+        if newAnimated {
             prepareTimer(targetTranform: transform)
         }
         else {
@@ -161,6 +197,8 @@ class CurveLayerView: UIView {
         shapeLayer.path = bezier.cgPath
     }
     
+
+ 
  
 }
 
@@ -224,12 +262,31 @@ class ViewlayoutTestViewController: BaseViewController<ViewLayoutTestViewModel> 
         super.viewDidLoad()
 
 //        testSnapKit()
-//        testCurveView()
+        testCurveView()
 //        testTextView()
 //        testPresent()
 //        testAnimation()
-        
 //        testAnimation()
+//        testSnapKit()
+    }
+    
+    func testSnapKit() {
+        
+        let redView = SnapKitTestView()
+   
+        redView.frame = CGRect(0, 100, 375, 200)
+        self.view.addSubview(redView)
+        
+      
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+            UIView.animate(withDuration: 3) {
+                redView.bounds = CGRect(0, 100, 200, 100)
+                redView.transform = CGAffineTransform(rotationAngle: CGFloat.pi/2)
+                redView.layoutIfNeeded()
+            }
+        }
+ 
+       
     }
     
     func testAnimation() {
@@ -257,10 +314,6 @@ class ViewlayoutTestViewController: BaseViewController<ViewLayoutTestViewModel> 
             
             UIView.commitAnimations()
         }
- 
-       
-        
-        
     }
     
     func testControllerWillAppear() {
@@ -281,7 +334,7 @@ class ViewlayoutTestViewController: BaseViewController<ViewLayoutTestViewModel> 
     }
     
     
-    func testSnapKit() {
+    func testLabelSnapKit() {
         let label = UILabel()
         view.addSubview(label)
         
@@ -321,7 +374,7 @@ class ViewlayoutTestViewController: BaseViewController<ViewLayoutTestViewModel> 
     func testCurveView() {
         
         let curveView = CurveLayerView()
-        curveView.frame = CGRect(0, 120, view.width, 200)
+        curveView.frame = CGRect(0, 300, view.width, 200)
         curveView.reload()
         curveView.backgroundColor = UIColor.black
         view.addSubview(curveView)
@@ -331,17 +384,32 @@ class ViewlayoutTestViewController: BaseViewController<ViewLayoutTestViewModel> 
  
 //        UIView.beginAnimations(nil, context: nil)
 //        UIView.setAnimationDuration(2)
-        curveView.setHeight(20, withY: 120, animated: true)
+ 
+//        CATransaction.begin()
+//        CATransaction.setAnimationDuration(1)
+//        CATransaction.setDisableActions(false)
+//        curveView.layer.top = 100
+//        CATransaction.commit()
 //        UIView.commitAnimations()
         
         
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 3) {
 //            UIView.beginAnimations(nil, context: nil)
-//            UIView.setAnimationDuration(2)
-            curveView.setHeight(100, withY: 120, animated:  true)
+//            UIView.setAnimationDuration(0.2)
+//            curveView.top = 300
+//
+//
+//
+//
 //            UIView.commitAnimations()
+            
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(1)
+            CATransaction.setDisableActions(false)
+            curveView.layer.top = 100
+            CATransaction.commit()
         }
-        
+//
         self.kvoController.observe(curveView, keyPath: "frame", options: []) { (_, _, _) in
             print("curveView's frame: \(curveView.frame)")
         }

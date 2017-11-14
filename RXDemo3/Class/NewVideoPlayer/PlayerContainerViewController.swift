@@ -26,11 +26,41 @@ class PlayerContainerViewModel: ViewModel {
     }
 }
 
+class PlayerControlProperty<Value> {
+    
+    private var valueChangeBlocks: [(Value, Value) -> Void] = []
+    
+    var value: Value {
+        didSet {
+            for block in valueChangeBlocks {
+                block(value, oldValue)
+            }
+        }
+    }
+    
+    func sendUpdateAction() {
+        for block in valueChangeBlocks {
+            block(value, value)
+        }
+    }
+    
+    init(_ value: Value) {
+        self.value = value
+    }
+    
+    func registerValueChange(_ block: @escaping (_ newValue: Value, _ oldValue: Value) -> Void) {
+        valueChangeBlocks.append(block)
+    }
+    
+    func clear() {
+        valueChangeBlocks = []
+    }
+}
+
 
 class PlayerContainerViewController: BaseViewController<PlayerContainerViewModel> {
     
-    var player: PlayerView = PlayerView()
- 
+    var playerView: CommonPlayerView = CommonPlayerView()
     
     override func didBind(to viewModel: PlayerContainerViewModel?) {
         super.didBind(to: viewModel)
@@ -40,9 +70,7 @@ class PlayerContainerViewController: BaseViewController<PlayerContainerViewModel
         let playerDataDriver = Driver<AVPlayerData>.just(playerData)
         
         viewModel?.transform(input: PlayerContainerViewModel.Input.init(playerData: playerDataDriver)).playerData.drive(onNext: { (playerData) in
-            self.player.url = URL(string: playerData.urlString)!
-            //            self.player2.playerData = playerData
-            //            self.player2.play()
+            self.playerView.playerData = playerData
         }, onCompleted: nil, onDisposed: nil).disposed(by: disposeBag)
     }
     
@@ -53,63 +81,16 @@ class PlayerContainerViewController: BaseViewController<PlayerContainerViewModel
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
-        self.player.playerDelegate = self
-        self.player.playbackDelegate = self
-        self.player.view.frame = self.view.bounds
-        self.player.layerBackgroundColor = UIColor.white
-        
-        self.addChildViewController(self.player)
-        self.view.addSubview(self.player.view)
-        self.player.didMove(toParentViewController: self)
-        
-        self.player.playbackLoops = false
-        
-//        let tapGestureRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGestureRecognizer(_:)))
-//        tapGestureRecognizer.numberOfTapsRequired = 1
-//        self.player.view.addGestureRecognizer(tapGestureRecognizer)
- 
+        self.view.addSubview(playerView)
+        playerView.frame = CGRect(0, 200, self.view.width, 300)
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
     }
+
 }
 
-extension PlayerContainerViewController: PlayerDelegate {
-    
-    func playerReady(_ player: PlayerView) {
-    }
-    
-    func playerPlaybackStateDidChange(_ player: PlayerView) {
-    }
-    
-    func playerBufferingStateDidChange(_ player: PlayerView) {
-    }
-    
-    func playerBufferTimeDidChange(_ bufferTime: Double) {
-    }
-    
-}
-
-// MARK: - PlayerPlaybackDelegate
-
-extension PlayerContainerViewController: PlayerPlaybackDelegate {
-    
-    func playerCurrentTimeDidChange(_ player: PlayerView) {
-    }
-    
-    func playerPlaybackWillStartFromBeginning(_ player: PlayerView) {
-    }
-    
-    func playerPlaybackDidEnd(_ player: PlayerView) {
-    }
-    
-    func playerPlaybackWillLoop(_ player: PlayerView) {
-    }
-    
-}
 
 
 

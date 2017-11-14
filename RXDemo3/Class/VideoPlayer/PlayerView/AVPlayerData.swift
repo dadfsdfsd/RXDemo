@@ -24,6 +24,8 @@ open class AVPlayerData: NSObject {
     var canPlayWhenNotWifi: Bool = false;
 
     var urlString: String = ""
+    
+    var coverUrlString: String?
 
     override init() {
         super.init()
